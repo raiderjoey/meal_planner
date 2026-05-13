@@ -15,9 +15,6 @@ dist-ssr
 # PocketBase
 pb_data/
 pb_public/
-!pb_public/index.html
-!pb_public/favicon.svg
-!pb_public/icons.svg
 
 # Editor directories and files
 .vscode/*

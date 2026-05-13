@@ -60,8 +60,8 @@ export default function WeekView() {
         expand: 'ingredients_via_meal_id',
       });
       setMeals(records);
-    } catch (error) {
-      console.error('Failed to fetch meals', error);
+    } catch (error: any) {
+      console.error('Failed to fetch meals:', error.message || error);
       // Collections might not exist yet, so we ignore gracefully in UI
     } finally {
       setLoading(false);
@@ -117,8 +117,8 @@ export default function WeekView() {
       }
       setEditingDay(null);
       setMealName('');
-    } catch (e) {
-      console.error(e);
+    } catch (e: any) {
+      console.error('Error saving meal:', e.message || e);
       alert('Error saving meal. Make sure PocketBase collections are created.');
     }
   };
@@ -139,8 +139,8 @@ export default function WeekView() {
         added_to_shopping_list: true
       });
 
-    } catch (e) {
-      console.error(e);
+    } catch (e: any) {
+      console.error('Error adding ingredient:', e.message || e);
     }
   };
 
@@ -154,8 +154,26 @@ export default function WeekView() {
   const removeIngredient = async (id: string) => {
     try {
       await pb.collection('ingredients').delete(id);
-    } catch (e) {
-      console.error(e);
+    } catch (e: any) {
+      console.error('Error removing ingredient:', e.message || e);
+    }
+  };
+
+  /**
+   * Deletes a meal and its associated ingredients.
+   * 
+   * @async
+   * @param {string} mealId - The ID of the meal to delete.
+   * @returns {Promise<void>}
+   */
+  const deleteMeal = async (mealId: string) => {
+    if (!window.confirm('Are you sure you want to delete this meal and all its ingredients?')) {
+      return;
+    }
+    try {
+      await pb.collection('meals').delete(mealId);
+    } catch (e: any) {
+      console.error('Failed to delete meal:', e.message || e);
     }
   };
 
@@ -212,15 +230,27 @@ export default function WeekView() {
                   {format(day, 'MMM d')}
                 </h3>
                 {!isEditing && (
-                  <button 
-                    onClick={() => {
-                      setEditingDay(dayString);
-                      setMealName(meal?.name || '');
-                    }}
-                    className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
-                  >
-                    <Utensils className="w-4 h-4" />
-                  </button>
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                    {meal && (
+                      <button 
+                        onClick={() => deleteMeal(meal.id)}
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                        title="Delete meal"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                    <button 
+                      onClick={() => {
+                        setEditingDay(dayString);
+                        setMealName(meal?.name || '');
+                      }}
+                      className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"
+                      title="Edit meal"
+                    >
+                      <Utensils className="w-4 h-4" />
+                    </button>
+                  </div>
                 )}
               </div>
 
