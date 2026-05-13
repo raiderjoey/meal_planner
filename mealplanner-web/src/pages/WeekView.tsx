@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format, startOfWeek, addDays } from 'date-fns';
-import { Plus, Trash2, Loader2, Utensils } from 'lucide-react';
+import { Plus, Trash2, Loader2, Utensils, ChevronDown, ChevronUp } from 'lucide-react';
 import { pb } from '../lib/pocketbase';
 
 /**
@@ -36,6 +36,7 @@ export default function WeekView() {
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedMeals, setExpandedMeals] = useState<Set<string>>(new Set());
 
   // Form states
   const [editingDay, setEditingDay] = useState<string | null>(null);
@@ -83,6 +84,18 @@ export default function WeekView() {
       pb.collection('ingredients').unsubscribe('*');
     };
   }, []);
+
+  const toggleExpand = (mealId: string) => {
+    setExpandedMeals(prev => {
+      const next = new Set(prev);
+      if (next.has(mealId)) {
+        next.delete(mealId);
+      } else {
+        next.add(mealId);
+      }
+      return next;
+    });
+  };
 
   /**
    * Saves a meal for a specific day. Creates a new meal record if
@@ -181,6 +194,9 @@ export default function WeekView() {
           const dayString = format(day, 'yyyy-MM-dd');
           const meal = meals.find(m => m.day_of_week === dayString);
           const ingredients = meal?.expand?.['ingredients_via_meal_id'] || [];
+          const isExpanded = meal ? expandedMeals.has(meal.id) : false;
+          const displayedIngredients = isExpanded ? ingredients : ingredients.slice(0, 3);
+          const hasMore = ingredients.length > 3;
           const isEditing = editingDay === dayString;
 
           return (
@@ -246,9 +262,11 @@ export default function WeekView() {
                       </div>
                       
                       <div className="space-y-2 flex-1">
-                        <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Ingredients</h4>
-                        <ul className="space-y-1.5">
-                          {ingredients.map((ing: Ingredient) => (
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Ingredients</h4>
+                        </div>
+                        <ul className="space-y-1.5 transition-all duration-300">
+                          {displayedIngredients.map((ing: Ingredient) => (
                             <li key={ing.id} className="text-sm text-gray-600 flex justify-between items-center group/item p-1.5 hover:bg-gray-50 rounded-lg transition-colors">
                               <span className="flex items-center gap-2">
                                 <span className={`w-1.5 h-1.5 rounded-full ${ing.added_to_shopping_list ? 'bg-purple-400' : 'bg-gray-300'}`}></span>
@@ -263,6 +281,24 @@ export default function WeekView() {
                             </li>
                           ))}
                         </ul>
+                        {hasMore && (
+                          <button 
+                            onClick={() => toggleExpand(meal.id)}
+                            className="text-xs font-medium text-indigo-500 hover:text-indigo-700 flex items-center gap-1 mt-2 transition-colors"
+                          >
+                            {isExpanded ? (
+                              <>
+                                <ChevronUp className="w-3 h-3" />
+                                Show less
+                              </>
+                            ) : (
+                              <>
+                                <ChevronDown className="w-3 h-3" />
+                                Show {ingredients.length - 3} more...
+                              </>
+                            )}
+                          </button>
+                        )}
                       </div>
                       
                       <div className="mt-4 pt-4 border-t border-gray-100 flex gap-2">
