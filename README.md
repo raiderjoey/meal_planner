@@ -7,6 +7,12 @@ A fully self-hostable weekly meal planner and shopping list application designed
 - **Backend**: PocketBase (Single-binary embedded database & static server).
 - **Deployment**: Local shell scripts.
 
+## Recent Improvements
+- **Dynamic Navigation UI**: Replaced static links with `NavLink` to provide visual feedback for the active route.
+- **Tab Indicators**: Implemented color-coded indicator bars (Indigo for Week View, Purple for Shopping List) to improve navigation context.
+- **Icon Integration**: Added Lucide icons to navigation tabs with responsive color states.
+- **Route Handling**: Optimized route matching using the `end` prop to ensure correct active state on the landing page.
+
 ## Setup Instructions
 
 ### 1. Initialize Database
