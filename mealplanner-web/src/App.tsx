@@ -1,7 +1,14 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
 import { Calendar, ShoppingCart } from 'lucide-react';
 import WeekView from './pages/WeekView';
 import ShoppingList from './pages/ShoppingList';
+
+const getNavLinkClass = (isActive: boolean, color: 'indigo' | 'purple') =>
+  `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${
+    isActive
+      ? `border-${color}-500 text-gray-900`
+      : `border-transparent text-gray-500 hover:text-gray-700 hover:border-${color}-300`
+  }`;
 
 function App() {
   return (
@@ -17,20 +24,21 @@ function App() {
                   </span>
                 </div>
                 <div className="ml-8 flex space-x-8">
-                  <Link
+                  <NavLink
                     to="/"
-                    className="inline-flex items-center px-1 pt-1 border-b-2 border-indigo-500 text-sm font-medium text-gray-900"
+                    end
+                    className={({ isActive }) => getNavLinkClass(isActive, 'indigo')}
                   >
                     <Calendar className="w-4 h-4 mr-2 text-indigo-500" />
                     Week View
-                  </Link>
-                  <Link
+                  </NavLink>
+                  <NavLink
                     to="/shopping-list"
-                    className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-purple-300 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
+                    className={({ isActive }) => getNavLinkClass(isActive, 'purple')}
                   >
                     <ShoppingCart className="w-4 h-4 mr-2 text-purple-500" />
                     Shopping List
-                  </Link>
+                  </NavLink>
                 </div>
               </div>
             </div>
