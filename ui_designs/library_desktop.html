@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Quicksand:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#605b53",
+                    "on-secondary-container": "#795636",
+                    "secondary": "#7b5737",
+                    "primary": "#4c6151",
+                    "on-tertiary-fixed": "#1e1b15",
+                    "on-primary-container": "#f6fff4",
+                    "on-primary-fixed": "#0c1f13",
+                    "tertiary-container": "#79746b",
+                    "surface-container-lowest": "#ffffff",
+                    "surface": "#f8faf9",
+                    "inverse-on-surface": "#eff1f0",
+                    "secondary-fixed-dim": "#ecbd96",
+                    "background": "#f8faf9",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f2f4f3",
+                    "primary-fixed-dim": "#b5ccb8",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed": "#ffdcc1",
+                    "surface-variant": "#e1e3e2",
+                    "tertiary-fixed": "#e9e2d7",
+                    "surface-container-highest": "#e1e3e2",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed-dim": "#ccc6bb",
+                    "outline": "#737872",
+                    "surface-bright": "#f8faf9",
+                    "outline-variant": "#c3c8c1",
+                    "on-tertiary": "#ffffff",
+                    "inverse-primary": "#b5ccb8",
+                    "surface-dim": "#d8dada",
+                    "on-tertiary-container": "#fffbff",
+                    "error": "#ba1a1a",
+                    "primary-fixed": "#d1e9d4",
+                    "on-primary-fixed-variant": "#374b3c",
+                    "on-background": "#191c1c",
+                    "inverse-surface": "#2e3131",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed-variant": "#604022",
+                    "on-secondary-fixed": "#2e1500",
+                    "surface-container-high": "#e7e8e8",
+                    "secondary-container": "#fecea6",
+                    "on-secondary": "#ffffff",
+                    "surface-tint": "#4e6353",
+                    "on-surface-variant": "#434843",
+                    "surface-container": "#eceeee",
+                    "on-surface": "#191c1c",
+                    "on-tertiary-fixed-variant": "#4a463e",
+                    "primary-container": "#647a69"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "8px",
+                    "xl": "80px",
+                    "xs": "4px",
+                    "lg": "48px",
+                    "margin-mobile": "16px",
+                    "margin-desktop": "64px",
+                    "gutter": "24px",
+                    "md": "24px",
+                    "sm": "12px"
+            },
+            "fontFamily": {
+                    "headline-sm": ["Quicksand"],
+                    "label-md": ["Quicksand"],
+                    "body-lg": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-lg": ["Quicksand"],
+                    "label-sm": ["Quicksand"],
+                    "headline-md": ["Quicksand"],
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Quicksand"]
+            },
+            "fontSize": {
+                    "headline-sm": ["22px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "700"}],
+                    "headline-md": ["28px", {"lineHeight": "34px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["32px", {"lineHeight": "38px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .custom-shadow-level-1 {
+            box-shadow: 0px 4px 20px rgba(54, 57, 57, 0.05);
+        }
+        .custom-shadow-hover {
+            box-shadow: 0px 8px 30px rgba(54, 57, 57, 0.08);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col font-body-md">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-on-background shadow-sm sticky top-0 z-50">
+<div class="flex justify-between items-center px-margin-desktop py-4 w-full max-w-[1280px] mx-auto">
+<div class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed-dim">HarvestPlan</div>
+<nav class="hidden md:flex items-center gap-md">
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="font-label-md text-label-md text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-bold" href="#">Ingredients</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors" href="#">Shopping List</a>
+</nav>
+<div class="flex items-center gap-sm">
+<div class="relative hidden sm:block">
+<input class="bg-surface-container-low border border-outline-variant rounded-full px-4 py-2 pl-10 focus:outline-none focus:border-primary transition-all w-64 text-body-sm" placeholder="Search meals..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+</div>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-all">notifications</button>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-all">account_circle</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-[1280px] mx-auto px-margin-desktop py-lg">
+<!-- Header Section -->
+<section class="mb-lg flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-background">Meal Library</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-2 max-w-2xl">Browse your curated collection of farm-fresh recipes and planned meals. Organized for health and simplicity.</p>
+</div>
+<div class="flex gap-sm">
+<button class="bg-primary text-on-primary px-6 py-3 rounded-xl font-label-md text-label-md flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined">add</span>
+                    Create New Meal
+                </button>
+</div>
+</section>
+<!-- Filter Bar -->
+<section class="flex flex-wrap items-center gap-md mb-lg bg-surface-container-low p-sm rounded-xl">
+<div class="flex items-center gap-sm px-2">
+<span class="material-symbols-outlined text-primary">filter_list</span>
+<span class="font-label-md text-label-md text-tertiary">Quick Filters:</span>
+</div>
+<div class="flex flex-wrap gap-xs">
+<button class="bg-primary-container text-on-primary-container px-4 py-2 rounded-full font-label-sm text-label-sm">All Recipes</button>
+<button class="bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-full font-label-sm text-label-sm hover:bg-primary-fixed transition-colors">Vegetarian</button>
+<button class="bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-full font-label-sm text-label-sm hover:bg-primary-fixed transition-colors">High Protein</button>
+<button class="bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-full font-label-sm text-label-sm hover:bg-primary-fixed transition-colors">Under 30 Min</button>
+<button class="bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-full font-label-sm text-label-sm hover:bg-primary-fixed transition-colors">Gluten-Free</button>
+</div>
+<div class="ml-auto hidden lg:block">
+<button class="text-primary font-label-md text-label-md flex items-center gap-1">
+                    Advanced Filters
+                    <span class="material-symbols-outlined">expand_more</span>
+</button>
+</div>
+</section>
+<!-- Bento Grid Layout -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Meal Card 1: Large Featured -->
+<div class="lg:col-span-2 lg:row-span-2 bg-white rounded-xl overflow-hidden custom-shadow-level-1 hover:custom-shadow-hover transition-all group flex flex-col">
+<div class="relative h-[400px] overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A vibrant and colorful Mediterranean harvest bowl placed on a clean wooden table in a sunlit kitchen. The bowl contains fresh roasted sweet potatoes, kale, chickpeas, and a creamy tahini dressing drizzled on top. The atmosphere is warm and organic, with soft morning light filtering through a window, emphasizing a fresh, healthy lifestyle. The background is slightly blurred with minimalist ceramic dishes." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA67fdBJgvaRl_Ft2T--yO8KCv-pcu4wAwg6HFAo0FowTevXr5GSxq1w90JbQMTuNTz1tXSlhhn9ycfTt2XROF0DxKTtOnoEzdxu_g70XiUQ5gWSa0cp67auGmbUbw--nYzcj-Xe-IxzfM14MX2Zqeyn-liRcew3e-Wm8NgtgRmlyV9zaH22Q34yHZmL1BEspnPjMvPhm3rqdeRRdj1Pl0oCx7snW0v83c_J_QWCbUm9jSHIHVGol09Ua9vQVt47e2apSTHKeg94TA"/>
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-white/90 backdrop-blur-md text-primary px-3 py-1 rounded-full font-label-sm text-label-sm">Vegan</span>
+<span class="bg-white/90 backdrop-blur-md text-primary px-3 py-1 rounded-full font-label-sm text-label-sm">Top Rated</span>
+</div>
+<button class="absolute top-4 right-4 bg-white/90 backdrop-blur-md text-error p-2 rounded-full custom-shadow-level-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<div class="p-md flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-headline-md text-on-background">Mediterranean Harvest Bowl</h3>
+<span class="text-tertiary flex items-center gap-1 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-sm">schedule</span> 25m
+                        </span>
+</div>
+<p class="text-body-md text-on-surface-variant flex-grow">A nourishing blend of roasted seasonal vegetables, protein-rich chickpeas, and a bright lemon-tahini drizzle.</p>
+<div class="mt-md flex items-center justify-between">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed border-2 border-white flex items-center justify-center text-[10px] font-bold">HP</div>
+<div class="w-8 h-8 rounded-full bg-primary-fixed border-2 border-white flex items-center justify-center text-[10px] font-bold text-primary">RS</div>
+</div>
+<button class="text-primary font-label-md text-label-md hover:underline">View Recipe</button>
+</div>
+</div>
+</div>
+<!-- Meal Card 2 -->
+<div class="bg-white rounded-xl overflow-hidden custom-shadow-level-1 hover:custom-shadow-hover transition-all group">
+<div class="h-48 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A close-up shot of a fresh green salad with sliced strawberries, goat cheese, and toasted walnuts in a rustic clay bowl. The lighting is soft and airy, typical of a bright modern kitchen aesthetic. The colors are dominated by fresh greens, deep reds, and soft whites, creating a clean and appetizing visual. Small drops of vinaigrette glisten on the leaves." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOz4jGtfcfwzzt6c24xprw4MKhhJlM0PHdLdrOMRLuJnPCTNNBWYP_-zOc-v_eVh2KL7q8XDyBMkpi2tJA58V7r-ttTh1jkHCSahxyb1S9GF3XX0hNve8417nMpDXUDN-Hj9Nf-K4zmwzdpwGFa1xp63pc2imIABlkdEy_33DIfeSQAXfRZ0Be-2GuOsM-qbDXIWv7xIjca4plRhDq8CLIm4Et3DUwhTiQ0EMv26-NGcg8vvDWOhKOucoE4Elz2BOOWzk8H_p_pZE"/>
+</div>
+<div class="p-md">
+<div class="flex gap-2 mb-2">
+<span class="text-tertiary font-label-sm text-label-sm">Gluten-Free</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-background mb-1">Spring Berry Salad</h3>
+<div class="flex items-center gap-4 text-on-surface-variant font-label-sm text-label-sm mt-4">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">flatware</span> 2 Servings</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">bolt</span> 340 cal</span>
+</div>
+</div>
+</div>
+<!-- Meal Card 3 -->
+<div class="bg-white rounded-xl overflow-hidden custom-shadow-level-1 hover:custom-shadow-hover transition-all group">
+<div class="h-48 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="An assortment of vibrant vegetables being prepared for a stir-fry on a large wooden cutting board. Sliced bell peppers, broccoli florets, and ginger slices are neatly arranged. The scene is illuminated by natural sunlight from a side window, creating long soft shadows and a tactile, farmhouse kitchen feel. The focus is sharp on the fresh ingredients, emphasizing quality and health." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCO3BGvBitaziJlQ3PCe2PrhSVjqoYF7ORwo6eKPZjsqRUD_0znAb8UPl_BidCw3sEUeZGHheXWsxBqgInsf8ZT7N-r7bu7q7saZto8zIJWrI8MpFRhU2f7qF5a4V915HphCFsjDBkfLELj0nKcFj_EjtpHI-Ht3-4v6AsDims8yxFRZpS6cwZyVkU3kW2Upu5KLl0ZvWsb-7MKUCiveMAm9fRIMqQ74H3l5cLMRjcQYQJgjdii1RY-Q1GJ7D5QI_nsrKj7HASQ8wA"/>
+</div>
+<div class="p-md">
+<div class="flex gap-2 mb-2">
+<span class="text-tertiary font-label-sm text-label-sm">Quick Prep</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-background mb-1">Rainbow Stir-Fry</h3>
+<div class="flex items-center gap-4 text-on-surface-variant font-label-sm text-label-sm mt-4">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 15m</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">bolt</span> 420 cal</span>
+</div>
+</div>
+</div>
+<!-- Meal Card 4 -->
+<div class="bg-white rounded-xl overflow-hidden custom-shadow-level-1 hover:custom-shadow-hover transition-all group">
+<div class="h-48 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A rustic sourdough loaf with a golden-brown crust, sitting on a linen cloth in a warm kitchen setting. Beside it is a small bowl of herb-infused olive oil. The lighting is cinematic yet natural, highlighting the textures of the bread and the soft fabric. The palette is composed of warm wood tones, oatmeal, and earthy greens, evoking a cozy, homemade feeling." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDc3uBPOB_rfFBV_YUTxwKFYdqUS15ryAR6mF5T3naBGDTLKH51zTdWW7Op83rOEo9ppNDmX-wOBhGchr8PQsm149usQFgC8Gicwt3hD0BmvcpJkeWMpnunwMNGnxCgN3OxfsGuzxG9MhkZx6aEZwnu8b5QxDzXcN1SssFdJcPfHdIEeubGpgR8J3U7UZhcXMHAZ-dV6GjziFELAqMl6US90aVIIGH26o2NRUvDsLpRLWBJX3mExlWzhngj7opQEDdUXSXnnXM5qcE"/>
+</div>
+<div class="p-md">
+<div class="flex gap-2 mb-2">
+<span class="text-tertiary font-label-sm text-label-sm">Artisan</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-background mb-1">Herb Garlic Sourdough</h3>
+<div class="flex items-center gap-4 text-on-surface-variant font-label-sm text-label-sm mt-4">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 4h</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">flatware</span> 8 Servings</span>
+</div>
+</div>
+</div>
+<!-- Meal Card 5 -->
+<div class="bg-white rounded-xl overflow-hidden custom-shadow-level-1 hover:custom-shadow-hover transition-all group">
+<div class="h-48 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A close-up of a rustic Margherita pizza with fresh basil leaves, buffalo mozzarella, and a rich tomato sauce. The crust is perfectly blistered. The photo is taken from a top-down angle on a dark, textured wood surface, with a glass of red wine slightly out of focus in the corner. High-quality food photography style with soft highlights and deep, appetizing colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3Nm-PSkwol82RD0E_CAr7gIjqSIyOFMWWYAX4Pa-McvBKVsGN4WBoD0BRYNoPjV2_FdVA_s4mq-j2T0hSYBibIeLVIQBnmKmPTcde2XI6gXyKcjnWzFX2micht-hmCxVEzhzJw8CzwG3WL0tDqQ5n4N7yqYWKFbHGAmI7o1ekTEwe-_GmbzW_AxrvrLZMO8eoRyeIf_OeLG_6wBi04J-CQ5NcQvLdIP-vm-CVmP2nQ35075TRQkK_XTV6uTEQ1pO-Y_sLa6FdXUY"/>
+</div>
+<div class="p-md">
+<div class="flex gap-2 mb-2">
+<span class="text-tertiary font-label-sm text-label-sm">Family Size</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-background mb-1">Garden Margherita</h3>
+<div class="flex items-center gap-4 text-on-surface-variant font-label-sm text-label-sm mt-4">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 45m</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">bolt</span> 680 cal</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Pagination or Load More -->
+<div class="mt-xl flex justify-center">
+<button class="border border-primary text-primary px-8 py-3 rounded-full font-label-md text-label-md hover:bg-primary-fixed transition-all flex items-center gap-2">
+                Show More Recipes
+                <span class="material-symbols-outlined">keyboard_arrow_down</span>
+</button>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-tertiary-container dark:bg-on-tertiary-fixed-variant mt-xl">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop py-lg w-full max-w-[1280px] mx-auto">
+<div class="flex flex-col items-center md:items-start gap-2 mb-md md:mb-0">
+<div class="font-headline-sm text-headline-sm text-on-tertiary-container">HarvestPlan</div>
+<p class="font-body-sm text-body-sm text-on-tertiary-container opacity-80">© 2024 HarvestPlan. Rooted in health.</p>
+</div>
+<div class="flex gap-md">
+<a class="font-body-sm text-body-sm text-on-tertiary-container opacity-80 hover:opacity-100 hover:text-primary transition-all" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-on-tertiary-container opacity-80 hover:opacity-100 hover:text-primary transition-all" href="#">Terms of Service</a>
+<a class="font-body-sm text-body-sm text-on-tertiary-container opacity-80 hover:opacity-100 hover:text-primary transition-all" href="#">Help Center</a>
+</div>
+<div class="flex gap-sm mt-md md:mt-0">
+<button class="material-symbols-outlined text-on-tertiary-container opacity-80 hover:opacity-100">language</button>
+<button class="material-symbols-outlined text-on-tertiary-container opacity-80 hover:opacity-100">share</button>
+</div>
+</div>
+</footer>
+</body></html>

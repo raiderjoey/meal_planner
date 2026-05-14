@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HarvestPlan | Weekly Meal Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#605b53",
+                        "on-secondary-container": "#795636",
+                        "secondary": "#7b5737",
+                        "primary": "#4c6151",
+                        "on-tertiary-fixed": "#1e1b15",
+                        "on-primary-container": "#f6fff4",
+                        "on-primary-fixed": "#0c1f13",
+                        "tertiary-container": "#79746b",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f8faf9",
+                        "inverse-on-surface": "#eff1f0",
+                        "secondary-fixed-dim": "#ecbd96",
+                        "background": "#f8faf9",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f2f4f3",
+                        "primary-fixed-dim": "#b5ccb8",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#ffdcc1",
+                        "surface-variant": "#e1e3e2",
+                        "tertiary-fixed": "#e9e2d7",
+                        "surface-container-highest": "#e1e3e2",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#ccc6bb",
+                        "outline": "#737872",
+                        "surface-bright": "#f8faf9",
+                        "outline-variant": "#c3c8c1",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#b5ccb8",
+                        "surface-dim": "#d8dada",
+                        "on-tertiary-container": "#fffbff",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#d1e9d4",
+                        "on-primary-fixed-variant": "#374b3c",
+                        "on-background": "#191c1c",
+                        "inverse-surface": "#2e3131",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#604022",
+                        "on-secondary-fixed": "#2e1500",
+                        "surface-container-high": "#e7e8e8",
+                        "secondary-container": "#fecea6",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#4e6353",
+                        "on-surface-variant": "#434843",
+                        "surface-container": "#eceeee",
+                        "on-surface": "#191c1c",
+                        "on-tertiary-fixed-variant": "#4a463e",
+                        "primary-container": "#647a69"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "xl": "80px",
+                        "xs": "4px",
+                        "lg": "48px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px",
+                        "md": "24px",
+                        "sm": "12px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Quicksand"],
+                        "label-md": ["Quicksand"],
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Quicksand"],
+                        "label-sm": ["Quicksand"],
+                        "headline-md": ["Quicksand"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["22px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "700"}],
+                        "headline-md": ["28px", {"lineHeight": "34px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["32px", {"lineHeight": "38px", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .meal-card-shadow {
+            box-shadow: 0px 4px 20px rgba(54, 57, 57, 0.05);
+        }
+        .meal-card-shadow:hover {
+            box-shadow: 0px 4px 20px rgba(54, 57, 57, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface shadow-sm sticky top-0 z-50">
+<div class="flex justify-between items-center px-margin-desktop py-4 w-full max-w-[1280px] mx-auto">
+<div class="text-headline-md font-headline-md font-bold text-primary">HarvestPlan</div>
+<nav class="hidden md:flex items-center gap-md">
+<a class="font-label-md text-label-md text-primary border-b-2 border-primary pb-1 font-bold" href="#">Dashboard</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Ingredients</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Shopping List</a>
+</nav>
+<div class="flex items-center gap-base">
+<div class="relative hidden lg:block mr-md">
+<input class="bg-surface-container-low border-none rounded-full px-6 py-2 text-body-sm w-64 focus:ring-2 focus:ring-primary focus:bg-white transition-all" placeholder="Search recipes..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-2 text-on-surface-variant">search</span>
+</div>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-all duration-200">notifications</button>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-all duration-200">account_circle</button>
+</div>
+</div>
+</header>
+<main class="flex-grow w-full max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-lg">
+<!-- Dashboard Header & Week Navigation -->
+<section class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md mb-lg">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-background">Your Weekly Plan</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Fresh, organized, and nourishing meals for your week.</p>
+</div>
+<div class="flex items-center bg-surface-container rounded-full p-1.5 shadow-sm">
+<button class="material-symbols-outlined p-2 hover:bg-white rounded-full transition-all">chevron_left</button>
+<span class="px-md font-label-md text-label-md text-on-surface-variant font-bold">May 15 - May 21</span>
+<button class="material-symbols-outlined p-2 hover:bg-white rounded-full transition-all">chevron_right</button>
+</div>
+</section>
+<!-- Weekly Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-7 gap-gutter items-start">
+<!-- Individual Day Card: Monday -->
+<div class="bg-white rounded-xl meal-card-shadow overflow-hidden flex flex-col border border-surface-container-high h-full">
+<div class="bg-surface-container-low p-sm text-center border-b border-surface-variant">
+<p class="font-label-sm text-label-sm text-tertiary uppercase tracking-widest">Mon</p>
+<p class="font-headline-sm text-headline-sm text-on-surface">15</p>
+</div>
+<div class="p-4 flex flex-col gap-4">
+<!-- Breakfast Slot -->
+<div class="group cursor-pointer">
+<p class="font-label-sm text-label-sm text-on-surface-variant/60 mb-1">Breakfast</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A bright, sunlit breakfast bowl containing organic yogurt, fresh blueberries, and crunchy golden granola. The composition is minimalist and clean, set on a white marble surface with a soft sage green napkin. High-key lighting highlights the freshness of the fruit and the creamy texture of the yogurt." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBk-1gSlVWch8_UXVh36-UumFVZxNQgxPomjnTadCWkvmu9RvIKXN8-ueDGlqPOmZRrGFJiRmiRYWjyo63khEV2KGp2nkDXzuEPqoyUvAWTUiiMVPSE2V_CNb_5WCsFkUUas95pNdYl71cm2-Hzmmsp13oUyOB90tSBgM-m2RkNn3nb2JkVMtxzcYhDTWxj91cZlUSIfPg0mgs78TLQuJGahL8pI2JPchGEc328aCkCsUGgBQoEX3DBhKCAFe2dezvlqjjVk1FgCJw"/>
+</div>
+<p class="font-body-sm text-body-sm font-semibold text-on-surface">Berry Yogurt Bowl</p>
+</div>
+</div>
+<!-- Lunch Slot -->
+<div class="group cursor-pointer">
+<p class="font-label-sm text-label-sm text-on-surface-variant/60 mb-1">Lunch</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A vibrant, fresh Mediterranean salad bowl with crisp greens, bright red cherry tomatoes, cucumbers, and crumbled feta cheese. The lighting is airy and natural, suggesting a healthy garden-to-table lunch. Styled with minimalist wooden utensils on a neutral linen background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCf5y7Mol_R8XtA7ZdjpltwZzP7nwENU3of6V6YrRoOPEoG2pJryvBS8pR4ywqy41TSxdEmjla1si_ciTzoECRdvqIehtW6Ey9ChhIlz3UiLikfvZiTHPcW-COpfs3eZZyPegQMpeql5Te-BMs0nVcT7hJtYbDxuU7OIt6JsLdiMXsd4YnYyqYwCqsfQsDPNsUS2_FAyzivFnk3DkvvW05bn5_iPorftX5E3qljDNEM5zrIZDecWs7v641XRxqtUKhIkJS08SjdMP4"/>
+</div>
+<p class="font-body-sm text-body-sm font-semibold text-on-surface">Garden Salad</p>
+</div>
+</div>
+<!-- Dinner Slot -->
+<div class="group cursor-pointer">
+<p class="font-label-sm text-label-sm text-on-surface-variant/60 mb-1">Dinner</p>
+<div class="flex flex-col justify-center border-2 border-dashed border-outline-variant rounded-lg p-2 hover:border-primary transition-colors text-center bg-surface">
+<span class="material-symbols-outlined text-primary text-[20px]">add</span>
+<p class="font-label-sm text-label-sm text-primary">Add Dinner</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Individual Day Card: Tuesday -->
+<div class="bg-white rounded-xl meal-card-shadow overflow-hidden flex flex-col border border-surface-container-high h-full">
+<div class="bg-surface-container-low p-sm text-center border-b border-surface-variant">
+<p class="font-label-sm text-label-sm text-tertiary uppercase tracking-widest">Tue</p>
+<p class="font-headline-sm text-headline-sm text-on-surface">16</p>
+</div>
+<div class="p-4 flex flex-col gap-4">
+<div class="group cursor-pointer">
+<p class="font-label-sm text-label-sm text-on-surface-variant/60 mb-1">Breakfast</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Softly poached eggs resting on slices of whole-grain artisanal toast with creamy avocado. The lighting is warm and inviting, evoking a slow, healthy morning in a bright kitchen. Soft shadows and a clean, organic aesthetic define the image." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCO_3dguKh-iKFT7DsqTbuQl-UI-5ERyzQUDgFPtDQUBV54tEXy1Du5AbqyKjv_stjIPLrScKcp9AzIBVEu6iqS95ykDDJq7XdtDqlAegjXNZ9rijRpzK4RQmZpNG7YePynz4H1-_2UAjtQnTcXBG-jpIF4gJpy-n_Z3EofUmWcUYWZgDQ2OfB4UboGmtcu1jsM9TZ5qLt7zyCQupiUW3jEz3ER9aqh11M295YkSU_93yTRCA1xW38rWnJcFdmzExddhzl9MLm2_rg"/>
+</div>
+<p class="font-body-sm text-body-sm font-semibold text-on-surface">Avocado Toast</p>
+</div>
+</div>
+<div class="group cursor-pointer">
+<p class="font-label-sm text-label-sm text-on-surface-variant/60 mb-1">Lunch</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A nourishing grain bowl with quinoa, roasted sweet potatoes, and steamed kale, presented in a minimalist ceramic bowl. Soft overhead lighting creates a gentle glow on the wholesome ingredients, reinforcing the farm-to-table brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhWmPU2lpTH4G0ka4alkoaEleGgAaFhebLr-C83lP2IwLVq15IwauG_ajmUg4xNazycprtlIcXTOf_70Y_BirAGSY3BS2MDQxi0JcO77y3n3QbX43Gemd-Co2k_AjxZluFhUf79MPzx1tIWidZoXubP64DBZL_NNTs-NHHU5Qc4g1_jeADtzjwNjP8IwywcU7ZdN4WxqSPo3fTZY9gjmjhTwVwk18umh8YT1PNX_iutLU7EqJbi5bXBKXPsCvWvr4jZgrpEUTcKjI"/>
+</div>
+<p class="font-body-sm text-body-sm font-semibold text-on-surface">Quinoa Bowl</p>
+</div>
+</div>
+<div class="group cursor-pointer">
+<p class="font-label-sm text-label-sm text-on-surface-variant/60 mb-1">Dinner</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A succulent grilled salmon fillet seasoned with herbs and lemon slices, served alongside roasted asparagus. The scene is elegant yet simple, with a focus on fresh ingredients and healthy preparation. Warm wood tones in the background add depth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBy2Pibw5I0jFLlPJQUzgho0ffLAjvIc--spz63K_0lmNEcRpQKiufjSakecxJbBAX5AYCujGa9PPyd_gUZk3TzAuaxzS6eMJcGDEMo_7C_rdGpDNc5iFkz5s-WBXo6r1UNm9vccjwlsjCZ5tv1WHBu8RGsHU0r5bdUafl9oQ1SygcCFKA84gefmgWxGBSAVwuCnHShtgFhzwz3K6teBtAxDf4O3EfCNBmLHO55qBQaqc4FPx27XcH2UlzKG8X_70WVPJs1OqmTETg"/>
+</div>
+<p class="font-body-sm text-body-sm font-semibold text-on-surface">Lemon Salmon</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Wednesday -->
+<div class="bg-surface-container-lowest rounded-xl meal-card-shadow overflow-hidden flex flex-col border-2 border-primary/20 h-full relative">
+<div class="absolute top-2 right-2 bg-primary text-white text-[10px] px-2 py-0.5 rounded-full font-bold">TODAY</div>
+<div class="bg-primary-fixed p-sm text-center border-b border-primary-fixed-dim">
+<p class="font-label-sm text-label-sm text-on-primary-fixed-variant uppercase tracking-widest">Wed</p>
+<p class="font-headline-sm text-headline-sm text-on-primary-fixed">17</p>
+</div>
+<div class="p-4 flex flex-col gap-4">
+<div class="group cursor-pointer">
+<p class="font-label-sm text-label-sm text-on-surface-variant/60 mb-1">Breakfast</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Glass jars filled with overnight oats, topped with fresh raspberries and a drizzle of honey. The jars are arranged in a clean, organized row in a bright, modern refrigerator. Freshness and preparation are the key themes." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfIWXSU2TjTuNiJojT_m1hkISf6cGHeWHTdS3O3xWpCUMhnMRNVpG5L8ryjv9pvS_u7yqzcszoCKKSbO1DONd3RvOJ01tg45424XwLzYT3zKaB3lvG266975tUF10yCZRR9JHA4cWwzCeLEUqcZigsrdokcJuMizCKr2o5-dWUZh3Caiyxg39Yt-a2iIBlRNfvtezHwTP5CQmz7ZauzjETCX76NBW0qMf6pp-CaKsT1oIRU6Un14FkXOzCTxsr1a8f65X3c_i-NXY"/>
+</div>
+<p class="font-body-sm text-body-sm font-semibold text-on-surface">Overnight Oats</p>
+</div>
+</div>
+<button class="bg-surface-container-low border-2 border-dashed border-outline-variant rounded-lg p-sm hover:border-primary transition-all text-on-surface-variant font-label-md flex flex-col items-center justify-center gap-1 min-h-[64px]">
+<span class="material-symbols-outlined">restaurant_menu</span>
+                        Add Meal
+                    </button>
+<button class="bg-surface-container-low border-2 border-dashed border-outline-variant rounded-lg p-sm hover:border-primary transition-all text-on-surface-variant font-label-md flex flex-col items-center justify-center gap-1 min-h-[64px]">
+<span class="material-symbols-outlined">restaurant_menu</span>
+                        Add Meal
+                    </button>
+</div>
+</div>
+<!-- Thursday -->
+<div class="bg-white rounded-xl meal-card-shadow overflow-hidden flex flex-col border border-surface-container-high h-full">
+<div class="bg-surface-container-low p-sm text-center border-b border-surface-variant">
+<p class="font-label-sm text-label-sm text-tertiary uppercase tracking-widest">Thu</p>
+<p class="font-headline-sm text-headline-sm text-on-surface">18</p>
+</div>
+<div class="p-4 flex flex-col gap-4">
+<button class="bg-surface-container-low border-2 border-dashed border-outline-variant rounded-lg p-sm hover:border-primary transition-all text-on-surface-variant font-label-md flex flex-col items-center justify-center gap-1 min-h-[64px]">
+<span class="material-symbols-outlined">restaurant_menu</span>
+                        Add Meal
+                    </button>
+<button class="bg-surface-container-low border-2 border-dashed border-outline-variant rounded-lg p-sm hover:border-primary transition-all text-on-surface-variant font-label-md flex flex-col items-center justify-center gap-1 min-h-[64px]">
+<span class="material-symbols-outlined">restaurant_menu</span>
+                        Add Meal
+                    </button>
+<button class="bg-surface-container-low border-2 border-dashed border-outline-variant rounded-lg p-sm hover:border-primary transition-all text-on-surface-variant font-label-md flex flex-col items-center justify-center gap-1 min-h-[64px]">
+<span class="material-symbols-outlined">restaurant_menu</span>
+                        Add Meal
+                    </button>
+</div>
+</div>
+<!-- Friday -->
+<div class="bg-white rounded-xl meal-card-shadow overflow-hidden flex flex-col border border-surface-container-high h-full">
+<div class="bg-surface-container-low p-sm text-center border-b border-surface-variant">
+<p class="font-label-sm text-label-sm text-tertiary uppercase tracking-widest">Fri</p>
+<p class="font-headline-sm text-headline-sm text-on-surface">19</p>
+</div>
+<div class="p-4 flex flex-col gap-4">
+<div class="group cursor-pointer">
+<p class="font-label-sm text-label-sm text-on-surface-variant/60 mb-1">Dinner</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Homemade artisan pizza with fresh tomato sauce, melted buffalo mozzarella, and basil leaves. The lighting is rustic and warm, capturing the texture of the thin, crispy crust. A simple, inviting image for a Friday night meal." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuTNy14o7nYQBKKmpSYkLo218g3Ktpm8pHmZQ5E0Irp2orL5XhVfr_IoAdMci0jbh6HfWm6gf20IHXkIjnh0ZGZUyeoHga234asrcSdRBTi1Uf7OKV_6qknsLK5igDR2Kuc234iWbKnScHJzj2IKFR4NmHcfJzDUc2lB6I4JjPmKSDCWjj4BeIIwwWiBkdpmlZ7Om5NHA5UOJ50ToaU4z-pDyOrBlXvZUjxcCsOUpXSThnp9DvS1MSMUkURIFBdGcejh4nsNzMMGU"/>
+</div>
+<p class="font-body-sm text-body-sm font-semibold text-on-surface">Friday Pizza Night</p>
+</div>
+</div>
+<button class="bg-surface-container-low border-2 border-dashed border-outline-variant rounded-lg p-sm hover:border-primary transition-all text-on-surface-variant font-label-md flex flex-col items-center justify-center gap-1 min-h-[64px]">
+<span class="material-symbols-outlined">restaurant_menu</span>
+                        Add Meal
+                    </button>
+</div>
+</div>
+<!-- Saturday -->
+<div class="bg-white rounded-xl meal-card-shadow overflow-hidden flex flex-col border border-surface-container-high h-full">
+<div class="bg-surface-container-low p-sm text-center border-b border-surface-variant">
+<p class="font-label-sm text-label-sm text-tertiary uppercase tracking-widest">Sat</p>
+<p class="font-headline-sm text-headline-sm text-on-surface">20</p>
+</div>
+<div class="p-4 flex flex-col gap-4">
+<div class="group cursor-pointer">
+<p class="font-label-sm text-label-sm text-on-surface-variant/60 mb-1">Snack</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A wooden plate with artisanal cheese, whole-wheat crackers, and fresh green grapes. The composition is clean and natural, lit by soft side lighting. It feels like a healthy, relaxed weekend snack option." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoPO6Er8ZIxV458y0J2H-8novDyHwCy3gV2B1aUH74Zsv8IBuVe_uMVxyx0EloRUWkPS2wZH6f4gMUPV9fa3_0xdmv-xpaH_lpfbRNp-IPVEIEq-TYgeYauMjn3IlYLH9JdEDqt9t5M0V4-mx_CFVEGrEyql13H6FfrUZRoyjFFLvv_PLNEyKZpDw4QevDBYJllEQ4uUPLP0tQRySnLY5zCUY8GTyo8c6ztkHHr-LFASv3EEg1z-UyulfhHtSN8_lD16AZso0knaw"/>
+</div>
+<p class="font-body-sm text-body-sm font-semibold text-on-surface">Cheese &amp; Fruit Plate</p>
+</div>
+</div>
+<button class="bg-surface-container-low border-2 border-dashed border-outline-variant rounded-lg p-sm hover:border-primary transition-all text-on-surface-variant font-label-md flex flex-col items-center justify-center gap-1 min-h-[64px]">
+<span class="material-symbols-outlined">restaurant_menu</span>
+                        Add Meal
+                    </button>
+</div>
+</div>
+<!-- Sunday -->
+<div class="bg-white rounded-xl meal-card-shadow overflow-hidden flex flex-col border border-surface-container-high h-full">
+<div class="bg-surface-container-low p-sm text-center border-b border-surface-variant">
+<p class="font-label-sm text-label-sm text-tertiary uppercase tracking-widest">Sun</p>
+<p class="font-headline-sm text-headline-sm text-on-surface">21</p>
+</div>
+<div class="p-4 flex flex-col gap-4">
+<div class="group cursor-pointer">
+<p class="font-label-sm text-label-sm text-on-surface-variant/60 mb-1">Lunch</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A hearty bowl of vegetable soup with carrots, celery, and herbs, served in a minimalist ceramic bowl with a side of crusty whole-grain bread. The mood is cozy and warm, emphasizing the organic and nourishing nature of the meal." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkBxYAOi9XEMiWFqi5f99y4kLcXjICu5hHIulkiej1huJoJey2gl2k7esL0EmOy808dIrsA6_FJWPwE4pgTrCp6I8dcqV3dQ6uUAiecUiKSJ6T4Uot_7jZnFrqc1l1qw1lxPGXZrUgFQctuNPMs0hAXIT5FbTwOMC1EtopzNTb1I8N6t0kXMkNI-nssSue_ARF10uBTLjslUOOJbsIao6OPckg9ThnExbqfaTFlmdfdCgT8tDFwBBb815-4nYqksDk-soMtZfgpfQ"/>
+</div>
+<p class="font-body-sm text-body-sm font-semibold text-on-surface">Hearty Veggie Soup</p>
+</div>
+</div>
+<button class="bg-surface-container-low border-2 border-dashed border-outline-variant rounded-lg p-sm hover:border-primary transition-all text-on-surface-variant font-label-md flex flex-col items-center justify-center gap-1 min-h-[64px]">
+<span class="material-symbols-outlined">restaurant_menu</span>
+                        Add Meal
+                    </button>
+</div>
+</div>
+</div>
+<!-- Meal Summary & Prep -->
+<section class="mt-xl grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<div class="lg:col-span-2 bg-tertiary-fixed rounded-xl p-6 flex flex-col md:flex-row items-center gap-lg border border-tertiary-fixed-dim">
+<div class="flex-grow">
+<h3 class="font-headline-sm text-headline-sm text-on-tertiary-fixed mb-2">Prep for Monday Morning</h3>
+<p class="font-body-sm text-body-sm text-on-tertiary-fixed-variant">Don't forget to soak your overnight oats and chop the garden salad ingredients for tomorrow's lunch.</p>
+</div>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-full font-label-md hover:shadow-lg transition-all transform active:scale-95 whitespace-nowrap">View Prep List</button>
+</div>
+<div class="bg-white rounded-xl p-6 meal-card-shadow border border-surface-container-high flex flex-col justify-between">
+<div>
+<h3 class="font-label-md text-label-md text-on-surface-variant font-bold mb-4 uppercase">Weekly Goal</h3>
+<div class="flex items-center justify-between mb-2">
+<span class="font-body-sm text-body-sm">80% Plant-Based</span>
+<span class="font-label-sm text-label-sm text-primary">65% Achieved</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[65%]"></div>
+</div>
+</div>
+<button class="text-secondary font-label-sm text-label-sm mt-4 flex items-center gap-1 hover:underline">
+                    View full nutrition breakdown <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+</section>
+</main>
+<!-- FAB for adding meals globally -->
+<button class="fixed bottom-margin-desktop right-margin-desktop bg-primary text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-transform z-40 md:hidden lg:flex">
+<span class="material-symbols-outlined text-[32px]">add</span>
+</button>
+<!-- Footer -->
+<footer class="bg-tertiary-container dark:bg-on-tertiary-fixed-variant mt-xl">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop py-lg w-full max-w-[1280px] mx-auto text-on-tertiary-container">
+<div class="flex flex-col items-center md:items-start mb-base md:mb-0">
+<span class="font-headline-sm text-headline-sm text-on-tertiary-container">HarvestPlan</span>
+<p class="font-body-sm text-body-sm opacity-80 mt-1">© 2024 HarvestPlan. Rooted in health.</p>
+</div>
+<div class="flex gap-md">
+<a class="font-body-sm text-body-sm opacity-80 hover:opacity-100 hover:text-primary transition-opacity" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm opacity-80 hover:opacity-100 hover:text-primary transition-opacity" href="#">Terms of Service</a>
+<a class="font-body-sm text-body-sm opacity-80 hover:opacity-100 hover:text-primary transition-opacity" href="#">Help Center</a>
+</div>
+</div>
+</footer>
+</body></html>
