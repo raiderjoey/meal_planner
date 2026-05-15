@@ -37,21 +37,23 @@ describe('WeekView component', () => {
   });
 
   it('renders meals when fetched', async () => {
-    const mockMeals = [
+    const mockMealPlans = [
       {
         id: '1',
-        name: 'Test Meal',
-        day_of_week: '2025-03-24',
-        category: 'lunch',
+        date: '2026-05-15 12:00:00.000Z',
+        slot: 'lunch',
+        meal: 'meal1',
         expand: {
-          recipe_id: {
+          meal: {
+            id: 'meal1',
+            name: 'Test Meal',
             image: 'test.jpg'
           }
         }
       }
     ];
 
-    collectionMock.getFullList.mockResolvedValue(mockMeals);
+    collectionMock.getFullList.mockResolvedValue(mockMealPlans);
 
     render(
       <MemoryRouter>

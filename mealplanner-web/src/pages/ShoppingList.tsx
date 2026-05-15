@@ -15,6 +15,16 @@ const CATEGORY_MAP: Record<string, string> = {
 
 const ORDERED_CATEGORIES: ShoppingItem['category'][] = ["Produce", "Grains", "Dairy & Eggs", "Meat", "Pantry", "Other"];
 
+// Simple heuristic for categorization until schema is fully populated
+export const getHeuristicCategory = (name: string): ShoppingItem['category'] => {
+  const n = name.toLowerCase();
+  if (n.includes('spinach') || n.includes('tomato') || n.includes('potato') || n.includes('basil') || n.includes('kale') || n.includes('pepper')) return 'Produce';
+  if (n.includes('quinoa') || n.includes('bread') || n.includes('loaf') || n.includes('rice') || n.includes('pasta')) return 'Grains';
+  if (n.includes('yogurt') || n.includes('butter') || n.includes('egg') || n.includes('cheese') || n.includes('milk')) return 'Dairy & Eggs';
+  if (n.includes('chicken') || n.includes('beef') || n.includes('pork') || n.includes('fish') || n.includes('salmon')) return 'Meat';
+  return 'Other';
+};
+
 export default function ShoppingList() {
   const [items, setItems] = useState<ShoppingItem[]>([]);
   const [loading, setLoading] = useState(true);

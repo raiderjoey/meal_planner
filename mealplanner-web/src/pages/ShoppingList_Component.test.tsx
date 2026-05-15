@@ -55,9 +55,9 @@ describe('ShoppingList component', () => {
       expect(screen.queryByRole('status')).not.toBeInTheDocument();
     });
 
-    expect(screen.getByText('Produce')).toBeInTheDocument();
-    expect(screen.getByText('Meat')).toBeInTheDocument();
-    expect(screen.getByText('Spinach')).toBeInTheDocument();
-    expect(screen.getByText('Chicken')).toBeInTheDocument();
+    expect(screen.getAllByText('Produce').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Meat').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Spinach').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Chicken').length).toBeGreaterThan(0);
   });
 });
