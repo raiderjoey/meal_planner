@@ -44,7 +44,7 @@ Download and extract the PocketBase binary for your architecture:
    ```
 2. Navigate to `http://localhost:8090/_/` and create your admin account.
 3. Go to **Settings -> Export/Import**.
-4. Paste the content of `pb_schema.json` into the **Import** section and apply changes. This will create the `recipes`, `meals`, `ingredients`, and `prep_tasks` collections.
+4. Paste the content of `pb_schema.json` into the **Import** section and apply changes. This will create the `meals`, `meal_plans`, `prep_tasks`, and `shopping_items` collections.
 
 ### 3. Build & Serve
 Compile the frontend and move the assets to the PocketBase `pb_public` directory:
