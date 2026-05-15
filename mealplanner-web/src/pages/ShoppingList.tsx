@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { pb } from '../lib/pocketbase';
-import type { Ingredient } from '../types';
+import type { ShoppingItem } from '../types';
 import { Button, Card, PageHeader, Badge } from '../components/ui';
 
 const CATEGORY_MAP: Record<string, string> = {
@@ -13,34 +13,20 @@ const CATEGORY_MAP: Record<string, string> = {
   'Other': 'shopping_basket'
 };
 
-const ORDERED_CATEGORIES = ["Produce", "Grains", "Dairy & Eggs", "Meat", "Pantry", "Other"];
-
-// Simple heuristic for categorization until schema is updated
-export const getHeuristicCategory = (name: string): string => {
-const getHeuristicCategory = (name: string): string => {
-  const n = name.toLowerCase();
-  if (n.includes('spinach') || n.includes('tomato') || n.includes('potato') || n.includes('basil') || n.includes('kale') || n.includes('pepper')) return 'Produce';
-  if (n.includes('quinoa') || n.includes('bread') || n.includes('loaf') || n.includes('rice') || n.includes('pasta')) return 'Grains';
-  if (n.includes('yogurt') || n.includes('butter') || n.includes('egg') || n.includes('cheese') || n.includes('milk')) return 'Dairy & Eggs';
-  if (n.includes('chicken') || n.includes('beef') || n.includes('pork') || n.includes('fish') || n.includes('salmon')) return 'Meat';
-  return 'Other';
-};
+const ORDERED_CATEGORIES: ShoppingItem['category'][] = ["Produce", "Grains", "Dairy & Eggs", "Meat", "Pantry", "Other"];
 
 export default function ShoppingList() {
-  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [items, setItems] = useState<ShoppingItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
 
-  const fetchIngredients = async () => {
+  const fetchItems = async () => {
     try {
-      const records = await pb.collection('ingredients').getFullList<Ingredient>({
-        filter: 'added_to_shopping_list = true',
-        expand: 'meal_id',
+      const records = await pb.collection('shopping_items').getFullList<ShoppingItem>({
         sort: 'name',
       });
-      setIngredients(records);
+      setItems(records);
     } catch (error) {
-      console.error('Failed to fetch ingredients', error);
+      console.error('Failed to fetch shopping items', error);
     } finally {
       setLoading(false);
     }
@@ -48,38 +34,39 @@ export default function ShoppingList() {
 
   useEffect(() => {
     const init = async () => {
-      await fetchIngredients();
+      await fetchItems();
     };
     init();
     
-    const unsubscribeIngredients = pb.collection('ingredients').subscribe('*', fetchIngredients);
+    const unsubscribe = pb.collection('shopping_items').subscribe('*', fetchItems);
     return () => {
-      unsubscribeIngredients.then(unsub => unsub());
+      unsubscribe.then(unsub => unsub());
     };
   }, []);
 
-  const toggleChecked = (id: string) => {
-    setCheckedItems(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  const toggleChecked = async (item: ShoppingItem) => {
+    try {
+      await pb.collection('shopping_items').update(item.id, {
+        checked: !item.checked
+      });
+    } catch (error) {
+      console.error('Failed to update item', error);
+    }
   };
 
   const clearChecked = async () => {
-    if (!confirm('Remove checked items from shopping list?')) return;
-    for (const id of Array.from(checkedItems)) {
-      try {
-        await pb.collection('ingredients').update(id, { added_to_shopping_list: false });
-      } catch (e) {
-        console.error(e);
-      }
+    const checkedItems = items.filter(item => item.checked);
+    if (checkedItems.length === 0) return;
+    if (!confirm(`Remove ${checkedItems.length} checked items from shopping list?`)) return;
+    
+    try {
+      await Promise.all(checkedItems.map(item => pb.collection('shopping_items').delete(item.id)));
+    } catch (e) {
+      console.error('Failed to clear checked items', e);
     }
-    setCheckedItems(new Set());
   };
 
-  if (loading && ingredients.length === 0) {
+  if (loading && items.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
@@ -87,14 +74,38 @@ export default function ShoppingList() {
     );
   }
 
-  const grouped = ingredients.reduce((acc, ing) => {
-    const cat = ing.category || getHeuristicCategory(ing.name);
+  const grouped = items.reduce((acc, item) => {
+    const cat = item.category || 'Other';
     if (!acc[cat]) acc[cat] = [];
-    acc[cat].push(ing);
+    acc[cat].push(item);
     return acc;
-  }, {} as Record<string, Ingredient[]>);
+  }, {} as Record<string, ShoppingItem[]>);
 
   const activeCategories = ORDERED_CATEGORIES.filter(c => grouped[c]?.length > 0);
+
+  const ShoppingItemRow = ({ item, isMobile = false }: { item: ShoppingItem, isMobile?: boolean }) => (
+    <div 
+      key={item.id} 
+      className={`flex items-center p-sm hover:bg-surface-container-low rounded-lg transition-all group cursor-pointer ${item.checked ? 'opacity-60' : ''} ${isMobile ? 'bg-surface-container-lowest shadow-sm border border-surface-container' : ''}`}
+      onClick={() => toggleChecked(item)}
+    >
+      <input 
+        className={`${isMobile ? 'w-7 h-7' : 'w-6 h-6'} rounded-lg border-outline-variant text-primary focus:ring-primary-fixed-dim transition-all cursor-pointer`} 
+        type="checkbox" 
+        checked={item.checked}
+        readOnly
+      />
+      <div className={`${isMobile ? 'ml-4' : 'ml-4'} flex-1`}>
+        <div className="flex justify-between items-center">
+          <p className={`font-body-md text-body-md text-on-surface ${item.checked ? 'line-through' : ''}`}>{item.name}</p>
+          {item.quantity && <span className="text-on-surface-variant text-sm">{item.quantity}</span>}
+        </div>
+        {item.manual && (
+          <p className="font-body-sm text-body-sm text-on-surface-variant text-xs italic">Added manually</p>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-lg">
@@ -102,24 +113,50 @@ export default function ShoppingList() {
         title="Shopping List" 
         description="Aggregated from your Weekly Meal Plan"
       >
-        {checkedItems.size > 0 && (
+        {items.some(i => i.checked) && (
           <Button onClick={clearChecked} variant="tonal" className="bg-error-container text-on-error-container">
             <span className="material-symbols-outlined mr-2">delete_sweep</span>
-            Clear Checked
+            Clear
           </Button>
         )}
-        <Button variant="ghost" className="bg-surface-container-high">
+        <Button variant="ghost" className="bg-surface-container-high hidden md:flex">
           <span className="material-symbols-outlined mr-2">share</span>
           Share
         </Button>
-        <Button>
+        <Button className="hidden md:flex">
           <span className="material-symbols-outlined mr-2">print</span>
           Print
         </Button>
       </PageHeader>
 
-      {/* Main Content: Bento-style Grid for Categories */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+      {/* Mobile-only Summary/Header (Optional but nice to match design) */}
+      <section className="flex flex-col gap-2 md:hidden">
+        <h2 className="font-headline-lg text-[32px] text-on-surface">Weekly Grocery List</h2>
+        <p className="text-on-surface-variant font-body-sm">Organized for your curated meal plan.</p>
+      </section>
+
+      {/* Mobile Collapsible View */}
+      <div className="space-y-md md:hidden">
+        {activeCategories.map(cat => (
+          <details key={cat} className="group" open>
+            <summary className="list-none flex items-center justify-between py-2 border-b border-outline-variant cursor-pointer">
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-primary">{CATEGORY_MAP[cat]}</span>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface">{cat}</h3>
+              </div>
+              <span className="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+            </summary>
+            <div className="pt-4 space-y-3">
+              {grouped[cat]?.map(item => (
+                <ShoppingItemRow key={item.id} item={item} isMobile />
+              ))}
+            </div>
+          </details>
+        ))}
+      </div>
+
+      {/* Desktop Bento Grid Layout */}
+      <div className="hidden md:grid grid-cols-1 md:grid-cols-12 gap-gutter">
         {/* Left Column: Larger Categories */}
         <div className="md:col-span-8 space-y-gutter">
           {activeCategories.filter(c => c === 'Produce' || c === 'Other' || c === 'Meat').map(cat => (
@@ -134,28 +171,8 @@ export default function ShoppingList() {
                 </Badge>
               </div>
               <div className="space-y-sm">
-                {grouped[cat]?.map(ing => (
-                  <div 
-                    key={ing.id} 
-                    className={`flex items-center p-sm hover:bg-surface-container-low rounded-lg transition-all group cursor-pointer ${checkedItems.has(ing.id) ? 'opacity-60' : ''}`}
-                    onClick={() => toggleChecked(ing.id)}
-                  >
-                    <input 
-                      className="w-6 h-6 rounded-lg border-outline-variant text-primary focus:ring-primary-fixed-dim transition-all cursor-pointer" 
-                      type="checkbox" 
-                      checked={checkedItems.has(ing.id)}
-                      readOnly
-                    />
-                    <div className="ml-4 flex-1">
-                      <div className="flex justify-between items-center">
-                        <p className={`font-body-md text-body-md text-on-surface ${checkedItems.has(ing.id) ? 'line-through' : ''}`}>{ing.name}</p>
-                        {ing.quantity && <span className="text-on-surface-variant text-sm">{ing.quantity}</span>}
-                      </div>
-                      {ing.expand?.meal_id && (
-                        <p className="font-body-sm text-body-sm text-on-surface-variant">For: {ing.expand.meal_id.name}</p>
-                      )}
-                    </div>
-                  </div>
+                {grouped[cat]?.map(item => (
+                  <ShoppingItemRow key={item.id} item={item} />
                 ))}
               </div>
             </Card>
@@ -173,44 +190,27 @@ export default function ShoppingList() {
                 <h2 className="font-headline-sm text-headline-sm text-on-surface">{cat}</h2>
               </div>
               <div className="space-y-sm">
-                {grouped[cat]?.map(ing => (
-                  <div 
-                    key={ing.id} 
-                    className={`flex items-center p-sm hover:bg-surface-container-low rounded-lg transition-all group cursor-pointer ${checkedItems.has(ing.id) ? 'opacity-60' : ''}`}
-                    onClick={() => toggleChecked(ing.id)}
-                  >
-                    <input 
-                      className="w-5 h-5 rounded-lg border-outline-variant text-primary focus:ring-primary-fixed-dim transition-all cursor-pointer" 
-                      type="checkbox" 
-                      checked={checkedItems.has(ing.id)}
-                      readOnly
-                    />
-                    <div className="ml-3 flex-1">
-                      <div className="flex justify-between items-center">
-                        <p className={`font-body-md text-body-md text-on-surface ${checkedItems.has(ing.id) ? 'line-through' : ''}`}>{ing.name}</p>
-                        {ing.quantity && <span className="text-on-surface-variant text-xs">{ing.quantity}</span>}
-                      </div>
-                      {ing.expand?.meal_id && (
-                        <p className="font-body-sm text-body-sm text-on-surface-variant text-xs">For: {ing.expand.meal_id.name}</p>
-                      )}
-                    </div>
-                  </div>
+                {grouped[cat]?.map(item => (
+                  <ShoppingItemRow key={item.id} item={item} />
                 ))}
               </div>
             </Card>
           ))}
         </div>
+      </div>
 
-        {/* Seasonal Feature */}
-        <section className="md:col-span-12">
-          <div className="relative overflow-hidden rounded-xl bg-primary-container p-lg flex flex-col md:flex-row items-center gap-lg">
-            <div className="z-10 text-center md:text-left text-on-primary-container">
-              <h3 className="font-headline-md text-headline-md mb-sm">Seasonal Savvy</h3>
-              <p className="font-body-lg text-body-lg opacity-90 max-w-xl">
-                Heirloom tomatoes are at their peak freshness this month. We've automatically highlighted them for your favorite caprese salad meal plan!
-              </p>
-            </div>
-            <div className="relative w-full md:w-64 h-48 md:h-32 rounded-lg overflow-hidden flex-shrink-0 shadow-lg">
+      {/* Seasonal Savvy Tip (Matches Mobile & Desktop) */}
+      <section className="mt-lg">
+        <div className="bg-tertiary-fixed rounded-2xl p-6 flex flex-col md:flex-row gap-4 border border-outline-variant">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>lightbulb</span>
+            <h4 className="font-label-md text-on-tertiary-fixed text-primary uppercase font-bold">Seasonal Savvy Tip</h4>
+          </div>
+          <div className="flex flex-col md:flex-row gap-4 items-center">
+            <p className="font-body-sm text-on-tertiary-fixed-variant leading-relaxed flex-1">
+              It's peak Asparagus season! Consider swapping your green beans for fresh local asparagus to get the best nutritional value and flavor this week. Local farms are seeing high yields right now.
+            </p>
+            <div className="h-32 w-full md:w-64 rounded-xl overflow-hidden shadow-sm flex-shrink-0">
               <img 
                 className="w-full h-full object-cover" 
                 src="https://images.unsplash.com/photo-1592489637182-8c172d6d7826?auto=format&fit=crop&q=80&w=400" 
@@ -218,13 +218,13 @@ export default function ShoppingList() {
               />
             </div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
       {/* FAB for adding custom items */}
       <Button 
         size="icon"
-        className="fixed bottom-8 right-8 w-14 h-14 shadow-xl z-40"
+        className="fixed bottom-24 right-6 w-14 h-14 shadow-xl z-40"
       >
         <span className="material-symbols-outlined text-3xl">add</span>
       </Button>

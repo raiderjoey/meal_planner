@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { pb } from '../lib/pocketbase';
-import type { Recipe } from '../types';
+import type { Meal } from '../types';
 import { Loader2 } from 'lucide-react';
 import { Button, Card, PageHeader, Badge, IconButton } from '../components/ui';
 
 const MealLibrary: React.FC = () => {
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchRecipes = async () => {
+  const fetchMeals = async () => {
     try {
-      const records = await pb.collection('recipes').getFullList<Recipe>({
+      const records = await pb.collection('meals').getFullList<Meal>({
         sort: '-created',
       });
-      setRecipes(records);
+      setMeals(records);
     } catch (error) {
-      console.error('Failed to fetch recipes:', error);
+      console.error('Failed to fetch meals:', error);
     } finally {
       setLoading(false);
     }
@@ -23,22 +23,22 @@ const MealLibrary: React.FC = () => {
 
   useEffect(() => {
     const init = async () => {
-      await fetchRecipes();
+      await fetchMeals();
     };
     init();
 
-    const unsubscribe = pb.collection('recipes').subscribe('*', fetchRecipes);
+    const unsubscribe = pb.collection('meals').subscribe('*', fetchMeals);
     return () => {
       unsubscribe.then(unsub => unsub());
     };
   }, []);
 
-  const getImageUrl = (recipe: Recipe) => {
-    if (!recipe.image) return 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&q=80&w=800';
-    return pb.files.getURL(recipe, recipe.image);
+  const getImageUrl = (meal: Meal) => {
+    if (!meal.image) return 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&q=80&w=800';
+    return pb.files.getURL(meal, meal.image);
   };
 
-  if (loading && recipes.length === 0) {
+  if (loading && meals.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
@@ -80,19 +80,19 @@ const MealLibrary: React.FC = () => {
       </section>
 
       {/* Bento Grid Layout */}
-      {recipes.length > 0 ? (
+      {meals.length > 0 ? (
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
-          {/* Large Featured Card (First Recipe) */}
-          {recipes.slice(0, 1).map((recipe) => (
-            <Card key={recipe.id} className="lg:col-span-2 lg:row-span-2 overflow-hidden hover:custom-shadow-hover transition-all group flex flex-col" hoverable>
+          {/* Large Featured Card (First Meal) */}
+          {meals.slice(0, 1).map((meal) => (
+            <Card key={meal.id} className="lg:col-span-2 lg:row-span-2 overflow-hidden hover:custom-shadow-hover transition-all group flex flex-col" hoverable>
               <div className="relative h-[400px] overflow-hidden">
                 <img 
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                  src={getImageUrl(recipe)} 
-                  alt={recipe.name}
+                  src={getImageUrl(meal)} 
+                  alt={meal.name}
                 />
                 <div className="absolute top-4 left-4 flex gap-2">
-                  {recipe.tags && Array.isArray(recipe.tags) && recipe.tags.slice(0, 2).map(tag => (
+                  {meal.tags && Array.isArray(meal.tags) && meal.tags.slice(0, 2).map(tag => (
                     <Badge key={tag} variant="surface" className="bg-white/90 backdrop-blur-md text-primary">{tag}</Badge>
                   ))}
                 </div>
@@ -104,14 +104,9 @@ const MealLibrary: React.FC = () => {
               </div>
               <div className="p-md flex flex-col flex-grow">
                 <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-headline-md text-headline-md text-on-background">{recipe.name}</h3>
-                  {recipe.prep_time && (
-                    <span className="text-tertiary flex items-center gap-1 font-label-sm text-label-sm">
-                      <span className="material-symbols-outlined text-sm">schedule</span> {recipe.prep_time}
-                    </span>
-                  )}
+                  <h3 className="font-headline-md text-headline-md text-on-background">{meal.name}</h3>
                 </div>
-                <p className="text-body-md text-on-surface-variant flex-grow line-clamp-3">{recipe.description}</p>
+                <p className="text-body-md text-on-surface-variant flex-grow line-clamp-3">{meal.description}</p>
                 <div className="mt-md flex items-center justify-between">
                   <div className="flex -space-x-2">
                     <div className="w-8 h-8 rounded-full bg-secondary-fixed border-2 border-white flex items-center justify-center text-[10px] font-bold">HP</div>
@@ -124,32 +119,24 @@ const MealLibrary: React.FC = () => {
           ))}
 
           {/* Regular Cards */}
-          {recipes.slice(1).map((recipe) => (
-            <Card key={recipe.id} className="overflow-hidden hover:custom-shadow-hover transition-all group" hoverable>
+          {meals.slice(1).map((meal) => (
+            <Card key={meal.id} className="overflow-hidden hover:custom-shadow-hover transition-all group" hoverable>
               <div className="h-48 overflow-hidden">
                 <img 
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                  src={getImageUrl(recipe)} 
-                  alt={recipe.name}
+                  src={getImageUrl(meal)} 
+                  alt={meal.name}
                 />
               </div>
               <div className="p-md">
                 <div className="flex gap-2 mb-2">
-                  {recipe.tags && Array.isArray(recipe.tags) && (
-                    <span className="text-tertiary font-label-sm text-label-sm">{recipe.tags[0]}</span>
+                  {meal.tags && Array.isArray(meal.tags) && (
+                    <span className="text-tertiary font-label-sm text-label-sm">{meal.tags[0]}</span>
                   )}
                 </div>
-                <h3 className="font-headline-sm text-headline-sm text-on-background mb-1 line-clamp-1">{recipe.name}</h3>
+                <h3 className="font-headline-sm text-headline-sm text-on-background mb-1 line-clamp-1">{meal.name}</h3>
                 <div className="flex items-center gap-4 text-on-surface-variant font-label-sm text-label-sm mt-4">
-                  {recipe.prep_time && (
-                    <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">schedule</span> {recipe.prep_time}</span>
-                  )}
-                  {recipe.servings && (
-                    <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">flatware</span> {recipe.servings}</span>
-                  )}
-                  {recipe.calories && (
-                    <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">bolt</span> {recipe.calories}</span>
-                  )}
+                  <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">flatware</span> {meal.ingredients?.length || 0} Ingredients</span>
                 </div>
               </div>
             </Card>
@@ -157,13 +144,13 @@ const MealLibrary: React.FC = () => {
         </section>
       ) : (
         <div className="text-center py-xl bg-surface-container-lowest rounded-xl border-2 border-dashed border-outline-variant">
-          <p className="text-on-surface-variant font-body-lg">No recipes found in your library.</p>
-          <button className="mt-md text-primary font-label-md hover:underline cursor-pointer">Add your first recipe</button>
+          <p className="text-on-surface-variant font-body-lg">No meals found in your library.</p>
+          <button className="mt-md text-primary font-label-md hover:underline cursor-pointer">Add your first meal</button>
         </div>
       )}
 
       {/* Pagination */}
-      {recipes.length > 0 && (
+      {meals.length > 0 && (
         <div className="mt-xl flex justify-center">
           <Button variant="outline" className="flex items-center gap-2">
             Show More Recipes

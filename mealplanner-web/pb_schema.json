@@ -1,7 +1,7 @@
 [
     {
         "id": "collection_recipes",
-        "name": "recipes",
+        "name": "meals",
         "type": "base",
         "system": false,
         "schema": [
@@ -9,6 +9,10 @@
                 "name": "name",
                 "type": "text",
                 "required": true
+            },
+            {
+                "name": "description",
+                "type": "text"
             },
             {
                 "name": "image",
@@ -21,28 +25,16 @@
                 }
             },
             {
-                "name": "prep_time",
-                "type": "text"
+                "name": "ingredients",
+                "type": "json"
             },
             {
-                "name": "servings",
-                "type": "number"
-            },
-            {
-                "name": "calories",
-                "type": "number"
+                "name": "prep_steps",
+                "type": "json"
             },
             {
                 "name": "tags",
                 "type": "json"
-            },
-            {
-                "name": "description",
-                "type": "text"
-            },
-            {
-                "name": "instructions",
-                "type": "text"
             }
         ],
         "listRule": "",
@@ -53,80 +45,31 @@
     },
     {
         "id": "collection_meals",
-        "name": "meals",
+        "name": "meal_plans",
         "type": "base",
         "system": false,
         "schema": [
             {
-                "name": "day_of_week",
-                "type": "text",
+                "name": "date",
+                "type": "date",
                 "required": true
             },
             {
-                "name": "name",
-                "type": "text",
-                "required": true
-            },
-            {
-                "name": "category",
+                "name": "slot",
                 "type": "select",
                 "required": true,
                 "options": {
                     "maxSelect": 1,
-                    "values": ["breakfast", "lunch", "dinner", "dessert", "snack"]
+                    "values": ["breakfast", "lunch", "dinner", "snack"]
                 }
             },
             {
-                "name": "recipe_id",
+                "name": "meal",
                 "type": "relation",
                 "options": {
                     "collectionId": "collection_recipes",
                     "maxSelect": 1
                 }
-            }
-        ],
-        "listRule": "",
-        "viewRule": "",
-        "createRule": "",
-        "updateRule": "",
-        "deleteRule": ""
-    },
-    {
-        "id": "collection_ingredients",
-        "name": "ingredients",
-        "type": "base",
-        "system": false,
-        "schema": [
-            {
-                "name": "meal_id",
-                "type": "relation",
-                "required": true,
-                "options": {
-                    "collectionId": "collection_meals",
-                    "cascadeDelete": true,
-                    "maxSelect": 1
-                }
-            },
-            {
-                "name": "name",
-                "type": "text",
-                "required": true
-            },
-            {
-                "name": "added_to_shopping_list",
-                "type": "bool"
-            },
-            {
-                "name": "category",
-                "type": "select",
-                "options": {
-                    "maxSelect": 1,
-                    "values": ["Produce", "Grains", "Dairy & Eggs", "Meat", "Pantry", "Other"]
-                }
-            },
-            {
-                "name": "quantity",
-                "type": "text"
             }
         ],
         "listRule": "",
@@ -142,29 +85,63 @@
         "system": false,
         "schema": [
             {
-                "name": "title",
+                "name": "description",
                 "type": "text",
                 "required": true
             },
             {
-                "name": "meal_id",
+                "name": "completed",
+                "type": "bool"
+            },
+            {
+                "name": "due_date",
+                "type": "date"
+            },
+            {
+                "name": "meal_plan",
                 "type": "relation",
                 "options": {
                     "collectionId": "collection_meals",
                     "maxSelect": 1
                 }
+            }
+        ],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": ""
+    },
+    {
+        "id": "collection_ingredients",
+        "name": "shopping_items",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "name": "name",
+                "type": "text",
+                "required": true
             },
             {
-                "name": "is_completed",
-                "type": "bool"
-            },
-            {
-                "name": "priority",
+                "name": "quantity",
                 "type": "text"
             },
             {
-                "name": "target_date",
-                "type": "date"
+                "name": "category",
+                "type": "select",
+                "options": {
+                    "maxSelect": 1,
+                    "values": ["Produce", "Grains", "Dairy", "Meat", "Pantry", "Other"]
+                }
+            },
+            {
+                "name": "checked",
+                "type": "bool"
+            },
+            {
+                "name": "manual",
+                "type": "bool"
             }
         ],
         "listRule": "",

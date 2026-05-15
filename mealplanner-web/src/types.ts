@@ -1,49 +1,57 @@
-export type Category = 'breakfast' | 'lunch' | 'dinner' | 'dessert' | 'snack';
+export type Slot = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
-export interface Recipe {
-  id: string;
+export interface IngredientTemplate {
   name: string;
-  image: string;
-  prep_time: string;
-  servings: number;
-  calories: number;
-  tags: string[];
+  quantity: string;
+  unit: string;
+  category: string;
+}
+
+export interface PrepStepTemplate {
   description: string;
-  instructions: string;
+  time_offset_days: number;
 }
 
 export interface Meal {
   id: string;
-  day_of_week: string; // ISO Date string
   name: string;
-  category: Category;
-  recipe_id: string;
-  expand?: {
-    recipe_id?: Recipe;
-    'ingredients_via_meal_id'?: Ingredient[];
-  };
+  description: string;
+  image: string;
+  ingredients: IngredientTemplate[];
+  prep_steps: PrepStepTemplate[];
+  tags: string[];
+  created: string;
+  updated: string;
 }
 
-export interface Ingredient {
+export interface MealPlan {
   id: string;
-  meal_id: string;
-  name: string;
-  added_to_shopping_list: boolean;
-  category: 'Produce' | 'Grains' | 'Dairy & Eggs' | 'Meat' | 'Pantry' | 'Other';
-  quantity: string;
+  date: string; // ISO Date string
+  slot: Slot;
+  meal: string;
   expand?: {
-    meal_id?: Meal;
+    meal?: Meal;
   };
 }
 
 export interface PrepTask {
   id: string;
-  title: string;
-  meal_id: string;
-  is_completed: boolean;
-  priority: string;
-  target_date: string; // ISO Date string
+  description: string;
+  completed: boolean;
+  due_date: string; // ISO Date string
+  meal_plan: string;
   expand?: {
-    meal_id?: Meal;
+    meal_plan?: MealPlan;
   };
+}
+
+export interface ShoppingItem {
+  id: string;
+  name: string;
+  quantity: string;
+  category: 'Produce' | 'Grains' | 'Dairy & Eggs' | 'Meat' | 'Pantry' | 'Other';
+  checked: boolean;
+  manual: boolean;
+  created: string;
+  updated: string;
 }

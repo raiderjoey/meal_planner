@@ -8,13 +8,13 @@ import { Button, Card, PageHeader, Badge } from '../components/ui';
 const PrepList: React.FC = () => {
   const [tasks, setTasks] = useState<PrepTask[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [newTaskDescription, setNewTaskDescription] = useState('');
 
   const fetchTasks = async () => {
     try {
       const records = await pb.collection('prep_tasks').getFullList<PrepTask>({
-        expand: 'meal_id',
-        sort: 'target_date,priority',
+        expand: 'meal_plan.meal',
+        sort: 'due_date',
       });
       setTasks(records);
     } catch (error) {
@@ -39,7 +39,7 @@ const PrepList: React.FC = () => {
   const toggleComplete = async (task: PrepTask) => {
     try {
       await pb.collection('prep_tasks').update(task.id, {
-        is_completed: !task.is_completed,
+        completed: !task.completed,
       });
     } catch (error) {
       console.error('Failed to update task:', error);
@@ -47,14 +47,14 @@ const PrepList: React.FC = () => {
   };
 
   const addTask = async () => {
-    if (!newTaskTitle.trim()) return;
+    if (!newTaskDescription.trim()) return;
     try {
       await pb.collection('prep_tasks').create({
-        title: newTaskTitle.trim(),
-        is_completed: false,
-        target_date: new Date().toISOString(),
+        description: newTaskDescription.trim(),
+        completed: false,
+        due_date: new Date().toISOString(),
       });
-      setNewTaskTitle('');
+      setNewTaskDescription('');
     } catch (error) {
       console.error('Failed to add task:', error);
     }
@@ -68,11 +68,11 @@ const PrepList: React.FC = () => {
     );
   }
 
-  const todayTasks = tasks.filter(t => t.target_date && isToday(parseISO(t.target_date)));
-  const tomorrowTasks = tasks.filter(t => t.target_date && isTomorrow(parseISO(t.target_date)));
-  const otherTasks = tasks.filter(t => !t.target_date || (!isToday(parseISO(t.target_date)) && !isTomorrow(parseISO(t.target_date))));
+  const todayTasks = tasks.filter(t => t.due_date && isToday(parseISO(t.due_date)));
+  const tomorrowTasks = tasks.filter(t => t.due_date && isTomorrow(parseISO(t.due_date)));
+  const otherTasks = tasks.filter(t => !t.due_date || (!isToday(parseISO(t.due_date)) && !isTomorrow(parseISO(t.due_date))));
 
-  const completedCount = tasks.filter(t => t.is_completed && t.target_date && isToday(parseISO(t.target_date))).length;
+  const completedCount = tasks.filter(t => t.completed && t.due_date && isToday(parseISO(t.due_date))).length;
   const todayTotal = todayTasks.length;
   const progressPercent = todayTotal > 0 ? (completedCount / todayTotal) * 100 : 0;
 
@@ -94,8 +94,8 @@ const PrepList: React.FC = () => {
                   className="w-full bg-surface border border-outline-variant rounded-lg px-md py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-outline transition-all" 
                   placeholder="What needs prepping? (e.g., Wash kale)" 
                   type="text"
-                  value={newTaskTitle}
-                  onChange={(e) => setNewTaskTitle(e.target.value)}
+                  value={newTaskDescription}
+                  onChange={(e) => setNewTaskDescription(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && addTask()}
                 />
               </div>
@@ -129,24 +129,19 @@ const PrepList: React.FC = () => {
                   </div>
                   <div className="space-y-base">
                     {todayTasks.map(task => (
-                      <Card key={task.id} className={`p-md flex items-center gap-md border-l-4 border-l-secondary ${task.is_completed ? 'opacity-60' : ''}`} hoverable>
+                      <Card key={task.id} className={`p-md flex items-center gap-md border-l-4 border-l-secondary ${task.completed ? 'opacity-60' : ''}`} hoverable>
                         <input 
                           className="w-6 h-6 rounded-lg border-outline-variant text-primary focus:ring-primary cursor-pointer" 
                           type="checkbox" 
-                          checked={task.is_completed} 
+                          checked={task.completed} 
                           onChange={() => toggleComplete(task)}
                         />
                         <div className="flex-1">
-                          <h3 className={`font-label-md text-label-md text-on-surface ${task.is_completed ? 'line-through' : ''}`}>{task.title}</h3>
-                          {task.expand?.meal_id && (
-                            <p className="font-body-sm text-body-sm text-on-surface-variant">{task.expand.meal_id.name}</p>
+                          <h3 className={`font-label-md text-label-md text-on-surface ${task.completed ? 'line-through' : ''}`}>{task.description}</h3>
+                          {task.expand?.meal_plan?.expand?.meal && (
+                            <p className="font-body-sm text-body-sm text-on-surface-variant">{task.expand.meal_plan.expand.meal.name}</p>
                           )}
                         </div>
-                        {task.priority && (
-                          <Badge variant="surface" className="hidden sm:inline-flex">
-                            {task.priority}
-                          </Badge>
-                        )}
                       </Card>
                     ))}
                   </div>
@@ -162,24 +157,19 @@ const PrepList: React.FC = () => {
                   </div>
                   <div className="space-y-base">
                     {tomorrowTasks.map(task => (
-                      <Card key={task.id} className={`p-md flex items-center gap-md border-l-4 border-l-outline-variant ${task.is_completed ? 'opacity-60' : ''}`} hoverable>
+                      <Card key={task.id} className={`p-md flex items-center gap-md border-l-4 border-l-outline-variant ${task.completed ? 'opacity-60' : ''}`} hoverable>
                         <input 
                           className="w-6 h-6 rounded-lg border-outline-variant text-primary focus:ring-primary cursor-pointer" 
                           type="checkbox" 
-                          checked={task.is_completed} 
+                          checked={task.completed} 
                           onChange={() => toggleComplete(task)}
                         />
                         <div className="flex-1">
-                          <h3 className={`font-label-md text-label-md text-on-surface ${task.is_completed ? 'line-through' : ''}`}>{task.title}</h3>
-                          {task.expand?.meal_id && (
-                            <p className="font-body-sm text-body-sm text-on-surface-variant">{task.expand.meal_id.name}</p>
+                          <h3 className={`font-label-md text-label-md text-on-surface ${task.completed ? 'line-through' : ''}`}>{task.description}</h3>
+                          {task.expand?.meal_plan?.expand?.meal && (
+                            <p className="font-body-sm text-body-sm text-on-surface-variant">{task.expand.meal_plan.expand.meal.name}</p>
                           )}
                         </div>
-                        {task.priority && (
-                          <Badge variant="surface" className="hidden sm:inline-flex">
-                            {task.priority}
-                          </Badge>
-                        )}
                       </Card>
                     ))}
                   </div>
@@ -195,21 +185,21 @@ const PrepList: React.FC = () => {
                   </div>
                   <div className="space-y-base">
                     {otherTasks.map(task => (
-                      <Card key={task.id} className={`p-md flex items-center gap-md border-l-4 border-l-outline-variant ${task.is_completed ? 'opacity-60' : ''}`} hoverable>
+                      <Card key={task.id} className={`p-md flex items-center gap-md border-l-4 border-l-outline-variant ${task.completed ? 'opacity-60' : ''}`} hoverable>
                         <input 
                           className="w-6 h-6 rounded-lg border-outline-variant text-primary focus:ring-primary cursor-pointer" 
                           type="checkbox" 
-                          checked={task.is_completed} 
+                          checked={task.completed} 
                           onChange={() => toggleComplete(task)}
                         />
                         <div className="flex-1">
-                          <h3 className={`font-label-md text-label-md text-on-surface ${task.is_completed ? 'line-through' : ''}`}>{task.title}</h3>
+                          <h3 className={`font-label-md text-label-md text-on-surface ${task.completed ? 'line-through' : ''}`}>{task.description}</h3>
                           <div className="flex gap-2">
-                            {task.target_date && (
-                              <p className="font-body-sm text-body-sm text-primary">{format(parseISO(task.target_date), 'MMM d')}</p>
+                            {task.due_date && (
+                              <p className="font-body-sm text-body-sm text-primary">{format(parseISO(task.due_date), 'MMM d')}</p>
                             )}
-                            {task.expand?.meal_id && (
-                              <p className="font-body-sm text-body-sm text-on-surface-variant">{task.expand.meal_id.name}</p>
+                            {task.expand?.meal_plan?.expand?.meal && (
+                              <p className="font-body-sm text-body-sm text-on-surface-variant">{task.expand.meal_plan.expand.meal.name}</p>
                             )}
                           </div>
                         </div>
