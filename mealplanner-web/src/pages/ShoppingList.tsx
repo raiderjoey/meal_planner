@@ -17,6 +17,7 @@ const ORDERED_CATEGORIES = ["Produce", "Grains", "Dairy & Eggs", "Meat", "Pantry
 
 // Simple heuristic for categorization until schema is updated
 export const getHeuristicCategory = (name: string): string => {
+const getHeuristicCategory = (name: string): string => {
   const n = name.toLowerCase();
   if (n.includes('spinach') || n.includes('tomato') || n.includes('potato') || n.includes('basil') || n.includes('kale') || n.includes('pepper')) return 'Produce';
   if (n.includes('quinoa') || n.includes('bread') || n.includes('loaf') || n.includes('rice') || n.includes('pasta')) return 'Grains';

@@ -78,7 +78,11 @@ export default function WeekView() {
       // fetchMeals is called by the subscription
     } catch (e) {
       console.error('Error deleting meal:', e instanceof Error ? e.message : e);
+  const getMealImage = (meal: Meal) => {
+    if (meal.expand?.recipe_id?.image) {
+      return pb.files.getURL(meal.expand.recipe_id, meal.expand.recipe_id.image);
     }
+    return DEFAULT_MEAL_IMAGE;
   };
 
   const getMealImage = (meal: Meal) => {
@@ -145,6 +149,20 @@ export default function WeekView() {
                   {format(day, 'd')}
                 </p>
               </div>
+const deleteMeal = async (id: string) => {
+  if (!confirm('Are you sure you want to delete this meal?')) return;
+  try {
+    await pb.collection('meals').delete(id);
+  } catch (e) {
+    console.error('Error deleting meal:', e instanceof Error ? e.message : e);
+  }
+};
+
+const getMealImage = (meal: Meal) => {
+...
+              {CATEGORY_ORDER.map(category => {
+                const meal = dayMeals.find(m => m.category === category);
+                const isAdding = addingTo?.day === dayString && addingTo?.category === category;
 
               <div className="flex-1 p-sm space-y-md">
                 {CATEGORY_ORDER.map(category => {
@@ -176,6 +194,60 @@ export default function WeekView() {
                           </button>
                         </div>
                       ) : isAdding ? (
+                        <div className="flex flex-col gap-2 animate-in fade-in zoom-in duration-200">
+                          <input
+                            type="text"
+                            value={mealName}
+                            onChange={(e) => setMealName(e.target.value)}
+                            placeholder="Meal name..."
+                            className="w-full px-2 py-1 text-xs rounded-lg border border-primary outline-none"
+                            autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') saveMeal();
+                              if (e.key === 'Escape') setAddingTo(null);
+                            }}
+                          />
+                          <div className="flex gap-1">
+                            <Button onClick={saveMeal} size="sm" className="flex-1 py-1 rounded-md text-[10px]">Save</Button>
+                            <Button onClick={() => setAddingTo(null)} variant="ghost" size="sm" className="flex-1 py-1 rounded-md text-[10px] bg-surface-container hover:bg-surface-container-high">X</Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button 
+                          onClick={() => {
+                            setAddingTo({ day: dayString, category });
+                            setMealName('');
+                          }}
+                          className="w-full flex flex-col justify-center border-2 border-dashed border-outline-variant rounded-lg p-2 hover:border-primary transition-colors text-center bg-surface group-hover:bg-white cursor-pointer"
+                        >
+                          <span className="material-symbols-outlined text-primary text-[20px]">add</span>
+                          <p className="font-label-sm text-label-sm text-primary">Add {CATEGORY_LABELS[category]}</p>
+                        </button>
+                return (
+                  <div key={category} className="group relative">
+                    <p className="font-label-sm text-label-sm text-on-surface-variant/60 mb-1">{CATEGORY_LABELS[category]}</p>
+
+                    {meal ? (
+                      <div className="flex items-center gap-3 cursor-pointer group-hover:opacity-80 transition-opacity pr-8">
+                        <div className="w-10 h-10 rounded-lg overflow-hidden bg-surface-container flex-shrink-0">
+                          <img 
+                            className="w-full h-full object-cover" 
+                            src={getMealImage(meal)} 
+                            alt={meal.name} 
+                          />
+                        </div>
+                        <p className="font-body-sm text-body-sm font-semibold text-on-surface line-clamp-2">{meal.name}</p>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteMeal(meal.id);
+                          }}
+                          className="absolute right-0 top-6 opacity-0 group-hover:opacity-100 p-1 text-on-surface-variant hover:text-error transition-all"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                      </div>
+                    ) : isAdding ? (
                         <div className="flex flex-col gap-2 animate-in fade-in zoom-in duration-200">
                           <input
                             type="text"
