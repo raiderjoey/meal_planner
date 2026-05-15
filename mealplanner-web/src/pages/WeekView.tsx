@@ -71,6 +71,16 @@ export default function WeekView() {
     }
   };
 
+  const deleteMeal = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this meal?')) return;
+    try {
+      await pb.collection('meals').delete(id);
+      // fetchMeals is called by the subscription
+    } catch (e) {
+      console.error('Error deleting meal:', e instanceof Error ? e.message : e);
+    }
+  };
+
   const getMealImage = (meal: Meal) => {
     if (meal.expand?.recipe_id?.image) {
       return pb.files.getURL(meal.expand.recipe_id, meal.expand.recipe_id.image);
@@ -135,46 +145,37 @@ export default function WeekView() {
                   {format(day, 'd')}
                 </p>
               </div>
-const deleteMeal = async (id: string) => {
-  if (!confirm('Are you sure you want to delete this meal?')) return;
-  try {
-    await pb.collection('meals').delete(id);
-  } catch (e) {
-    console.error('Error deleting meal:', e instanceof Error ? e.message : e);
-  }
-};
 
-const getMealImage = (meal: Meal) => {
-...
-              {CATEGORY_ORDER.map(category => {
-                const meal = dayMeals.find(m => m.category === category);
-                const isAdding = addingTo?.day === dayString && addingTo?.category === category;
+              <div className="flex-1 p-sm space-y-md">
+                {CATEGORY_ORDER.map(category => {
+                  const meal = dayMeals.find(m => m.category === category);
+                  const isAdding = addingTo?.day === dayString && addingTo?.category === category;
 
-                return (
-                  <div key={category} className="group relative">
-                    <p className="font-label-sm text-label-sm text-on-surface-variant/60 mb-1">{CATEGORY_LABELS[category]}</p>
+                  return (
+                    <div key={category} className="group relative">
+                      <p className="font-label-sm text-label-sm text-on-surface-variant/60 mb-1">{CATEGORY_LABELS[category]}</p>
 
-                    {meal ? (
-                      <div className="flex items-center gap-3 cursor-pointer group-hover:opacity-80 transition-opacity pr-8">
-                        <div className="w-10 h-10 rounded-lg overflow-hidden bg-surface-container flex-shrink-0">
-                          <img 
-                            className="w-full h-full object-cover" 
-                            src={getMealImage(meal)} 
-                            alt={meal.name} 
-                          />
+                      {meal ? (
+                        <div className="flex items-center gap-3 cursor-pointer group-hover:opacity-80 transition-opacity pr-8">
+                          <div className="w-10 h-10 rounded-lg overflow-hidden bg-surface-container flex-shrink-0">
+                            <img 
+                              className="w-full h-full object-cover" 
+                              src={getMealImage(meal)} 
+                              alt={meal.name} 
+                            />
+                          </div>
+                          <p className="font-body-sm text-body-sm font-semibold text-on-surface line-clamp-2">{meal.name}</p>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteMeal(meal.id);
+                            }}
+                            className="absolute right-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1 text-on-surface-variant hover:text-error transition-all"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">delete</span>
+                          </button>
                         </div>
-                        <p className="font-body-sm text-body-sm font-semibold text-on-surface line-clamp-2">{meal.name}</p>
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteMeal(meal.id);
-                          }}
-                          className="absolute right-0 top-6 opacity-0 group-hover:opacity-100 p-1 text-on-surface-variant hover:text-error transition-all"
-                        >
-                          <span className="material-symbols-outlined text-[18px]">delete</span>
-                        </button>
-                      </div>
-                    ) : isAdding ? (
+                      ) : isAdding ? (
                         <div className="flex flex-col gap-2 animate-in fade-in zoom-in duration-200">
                           <input
                             type="text"
