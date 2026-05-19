@@ -23,7 +23,8 @@ CREATE TABLE ingredients (
   sugar numeric DEFAULT 0,
   unit text,
   created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
+  updated_at timestamptz DEFAULT now(),
+  UNIQUE (household_id, name)
 );
 
 -- Recipe Ingredients link (Junction table)
@@ -34,7 +35,8 @@ CREATE TABLE recipe_ingredients (
   ingredient_id uuid REFERENCES ingredients ON DELETE CASCADE NOT NULL,
   quantity numeric NOT NULL,
   unit text,
-  created_at timestamptz DEFAULT now()
+  created_at timestamptz DEFAULT now(),
+  UNIQUE (recipe_id, ingredient_id)
 );
 
 -- Meals table
@@ -58,7 +60,8 @@ CREATE TABLE meal_ingredients (
   ingredient_id uuid REFERENCES ingredients ON DELETE CASCADE NOT NULL,
   quantity numeric NOT NULL,
   unit text,
-  created_at timestamptz DEFAULT now()
+  created_at timestamptz DEFAULT now(),
+  UNIQUE (meal_id, ingredient_id)
 );
 
 -- User Meal Portions (Junction table)
@@ -69,7 +72,8 @@ CREATE TABLE user_meal_portions (
   profile_id uuid REFERENCES profiles ON DELETE CASCADE NOT NULL,
   portion_size numeric NOT NULL DEFAULT 1.0,
   consumed_at timestamptz,
-  created_at timestamptz DEFAULT now()
+  created_at timestamptz DEFAULT now(),
+  UNIQUE (meal_id, profile_id)
 );
 
 -- Pantry Items
@@ -123,10 +127,10 @@ ALTER TABLE meal_ingredients ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_meal_portions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pantry_items ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Manage household recipes" ON recipes FOR ALL USING (household_id = (SELECT get_current_user_household_id()));
-CREATE POLICY "Manage household ingredients" ON ingredients FOR ALL USING (household_id = (SELECT get_current_user_household_id()));
-CREATE POLICY "Manage household recipe ingredients" ON recipe_ingredients FOR ALL USING (household_id = (SELECT get_current_user_household_id()));
-CREATE POLICY "Manage household meals" ON meals FOR ALL USING (household_id = (SELECT get_current_user_household_id()));
-CREATE POLICY "Manage household meal ingredients" ON meal_ingredients FOR ALL USING (household_id = (SELECT get_current_user_household_id()));
-CREATE POLICY "Manage household portions" ON user_meal_portions FOR ALL USING (household_id = (SELECT get_current_user_household_id()));
-CREATE POLICY "Manage household pantry" ON pantry_items FOR ALL USING (household_id = (SELECT get_current_user_household_id()));
+CREATE POLICY "Manage household recipes" ON recipes FOR ALL USING (household_id = get_current_user_household_id());
+CREATE POLICY "Manage household ingredients" ON ingredients FOR ALL USING (household_id = get_current_user_household_id());
+CREATE POLICY "Manage household recipe ingredients" ON recipe_ingredients FOR ALL USING (household_id = get_current_user_household_id());
+CREATE POLICY "Manage household meals" ON meals FOR ALL USING (household_id = get_current_user_household_id());
+CREATE POLICY "Manage household meal ingredients" ON meal_ingredients FOR ALL USING (household_id = get_current_user_household_id());
+CREATE POLICY "Manage household portions" ON user_meal_portions FOR ALL USING (household_id = get_current_user_household_id());
+CREATE POLICY "Manage household pantry" ON pantry_items FOR ALL USING (household_id = get_current_user_household_id());
