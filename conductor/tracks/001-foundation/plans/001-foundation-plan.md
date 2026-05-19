@@ -163,7 +163,7 @@ git commit -m "feat: add supabase client and household context"
 **Files:**
 - Create: `supabase/migrations/20260518000000_core_schema.sql`
 
-- [ ] **Step 1: Write Migration for Households and Profiles**
+- [x] **Step 1: Write Migration for Households and Profiles**
 ```sql
 -- Create Households table
 CREATE TABLE households (
@@ -194,7 +194,7 @@ CREATE POLICY "Profiles are viewable by household members" ON profiles
   );
 ```
 
-- [ ] **Step 2: Commit Schema**
+- [x] **Step 2: Commit Schema**
 ```bash
 git add supabase/migrations/
 git commit -m "feat: add core household and profile schema with RLS"

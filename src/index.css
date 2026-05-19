@@ -1,13 +1,78 @@
-/* HarvestPlan Base Styles */
 :root {
-  --harvest-green: #4a6741;
-  --harvest-cream: #f9f7f2;
+  --primary: #4c6151;
+  --on-primary: #ffffff;
+  --secondary: #7b5737;
+  --on-secondary: #ffffff;
+  --background: #f8faf9;
+  --on-background: #191c1c;
+  --surface: #f8faf9;
+  --on-surface: #191c1c;
+  --surface-container: #eceeee;
+  --surface-container-low: #f2f4f3;
+  --surface-container-high: #e7e8e8;
+  --surface-container-highest: #e1e3e2;
+  --outline: #737872;
+  --outline-variant: #c3c8c1;
+  --on-surface-variant: #434843;
+  --tertiary: #605b53;
+  --tertiary-fixed: #e9e2d7;
+  --tertiary-fixed-dim: #ccc6bb;
+  --on-tertiary-fixed: #1e1b15;
+  --on-tertiary-fixed-variant: #4a463e;
+  --tertiary-container: #79746b;
+  --on-tertiary-container: #fffbff;
+
+  --font-headline: 'Quicksand', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  --margin-desktop: 64px;
+  --margin-mobile: 16px;
+  --gutter: 24px;
+  --border-radius: 12px;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: var(--harvest-cream);
-  color: var(--harvest-green);
+  font-family: var(--font-body);
+  background-color: var(--background);
+  color: var(--on-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-headline);
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.meal-card-shadow {
+  box-shadow: 0px 4px 20px rgba(54, 57, 57, 0.05);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.meal-card-shadow:hover {
+  box-shadow: 0px 4px 20px rgba(54, 57, 57, 0.08);
 }
