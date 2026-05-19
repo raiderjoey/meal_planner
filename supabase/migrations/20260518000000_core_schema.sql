@@ -73,8 +73,16 @@ RETURNS households AS $$
 DECLARE
   new_household households;
 BEGIN
+  -- Harden check
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+
   INSERT INTO households (name) VALUES (household_name) RETURNING * INTO new_household;
   UPDATE profiles SET household_id = new_household.id WHERE id = auth.uid();
   RETURN new_household;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+-- Drop direct insert policy
+DROP POLICY "Authenticated users can create a household" ON households;

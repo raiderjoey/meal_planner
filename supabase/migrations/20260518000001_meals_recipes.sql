@@ -144,3 +144,8 @@ CREATE POLICY "Manage household meals" ON meals FOR ALL USING (household_id = ge
 CREATE POLICY "Manage household meal ingredients" ON meal_ingredients FOR ALL USING (household_id = get_current_user_household_id());
 CREATE POLICY "Manage household portions" ON user_meal_portions FOR ALL USING (household_id = get_current_user_household_id());
 CREATE POLICY "Manage household pantry" ON pantry_items FOR ALL USING (household_id = get_current_user_household_id());
+
+-- Update meals table to use composite FK for recipe_id
+ALTER TABLE meals DROP CONSTRAINT IF EXISTS meals_recipe_id_fkey;
+ALTER TABLE meals ADD CONSTRAINT meals_recipe_id_household_id_fkey 
+  FOREIGN KEY (recipe_id, household_id) REFERENCES recipes(id, household_id) ON DELETE SET NULL;
