@@ -17,6 +17,7 @@ CREATE TABLE tags (
   household_id uuid REFERENCES households NOT NULL,
   name text NOT NULL,
   created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now(),
   UNIQUE (household_id, name),
   UNIQUE (id, household_id) -- For composite FKs
 );
@@ -29,3 +30,10 @@ CREATE INDEX idx_tags_household_id ON tags(household_id);
 -- Triggers for updated_at
 CREATE TRIGGER on_collection_update BEFORE UPDATE ON collections
   FOR EACH ROW EXECUTE PROCEDURE handle_updated_at();
+
+CREATE TRIGGER on_tag_update BEFORE UPDATE ON tags
+  FOR EACH ROW EXECUTE PROCEDURE handle_updated_at();
+
+-- Enable RLS
+ALTER TABLE collections ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tags ENABLE ROW LEVEL SECURITY;
