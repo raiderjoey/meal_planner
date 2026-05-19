@@ -33,6 +33,12 @@ CREATE TRIGGER on_profile_update
   FOR EACH ROW
   EXECUTE PROCEDURE handle_updated_at();
 
+-- Function to get household_id without recursion
+CREATE OR REPLACE FUNCTION get_current_user_household_id()
+RETURNS uuid AS $$
+  SELECT household_id FROM profiles WHERE id = auth.uid();
+$$ LANGUAGE sql SECURITY DEFINER SET search_path = public;
+
 -- Enable RLS
 ALTER TABLE households ENABLE ROW LEVEL SECURITY;
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
@@ -41,33 +47,23 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Authenticated users can create a household" ON households
   FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
+-- Households SELECT policy
 CREATE POLICY "Users can view their own household" ON households
-  FOR SELECT USING (
-    id IN (
-      SELECT household_id FROM profiles WHERE id = auth.uid()
-    )
-  );
+  FOR SELECT USING (id = get_current_user_household_id());
 
-CREATE POLICY "Users can update their own household" ON households
-  FOR UPDATE USING (
-    id IN (
-      SELECT household_id FROM profiles WHERE id = auth.uid()
-    )
-  );
+-- Households UPDATE/DELETE policy
+CREATE POLICY "Users can manage their own household" ON households
+  FOR ALL USING (id = get_current_user_household_id());
 
 -- Policies for Profiles
 CREATE POLICY "Users can insert their own profile" ON profiles
   FOR INSERT WITH CHECK (auth.uid() = id);
 
-CREATE POLICY "Users can view their own profile" ON profiles
-  FOR SELECT USING (auth.uid() = id);
-
+-- Profiles SELECT policy
 CREATE POLICY "Users can view household members" ON profiles
   FOR SELECT USING (
-    household_id IS NOT NULL AND 
-    household_id IN (
-      SELECT p.household_id FROM profiles p WHERE p.id = auth.uid()
-    )
+    (id = auth.uid()) OR 
+    (household_id = get_current_user_household_id())
   );
 
 CREATE POLICY "Users can update their own profile" ON profiles
