@@ -10,3 +10,36 @@ export interface Profile {
   full_name: string;
   avatar_url?: string;
 }
+
+export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'dessert' | 'drinks' | 'snacks';
+export type ParticipationStatus = 'planned' | 'consumed';
+
+export interface Nutrition {
+  calories: number;
+  protein: number;
+  fat: number;
+  carbs: number;
+  fiber?: number;
+}
+
+export interface MealPlan {
+  id: string;
+  household_id: string;
+  scheduled_date: string;
+  meal_type: MealType;
+  recipe_id?: string;
+  standalone_data?: {
+    name: string;
+    nutrition: Nutrition;
+  };
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MealParticipant {
+  household_id: string;
+  meal_plan_id: string;
+  user_id: string;
+  portion_multiplier: number;
+  status: ParticipationStatus;
+}

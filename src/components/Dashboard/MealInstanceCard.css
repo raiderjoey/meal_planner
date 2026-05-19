@@ -1,0 +1,122 @@
+.meal-instance-card {
+  background-color: white;
+  border-radius: var(--border-radius);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
+  border: 1px solid var(--outline-variant);
+  margin-bottom: 8px;
+}
+
+.meal-instance-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meal-type-tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  align-self: flex-start;
+  letter-spacing: 0.05em;
+}
+
+.meal-type-tag.breakfast { background-color: #fef3c7; color: #92400e; }
+.meal-type-tag.lunch { background-color: #d1fae5; color: #065f46; }
+.meal-type-tag.dinner { background-color: #dbeafe; color: #1e40af; }
+.meal-type-tag.dessert { background-color: #fce7f3; color: #9d174d; }
+.meal-type-tag.drinks { background-color: #e0f2fe; color: #075985; }
+.meal-type-tag.snacks { background-color: #f3f4f6; color: #374151; }
+
+.meal-instance-title {
+  font-size: 1rem;
+  color: var(--on-surface);
+}
+
+.meal-participants-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.participant-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-top: 1px solid var(--surface-container-highest);
+  padding-top: 8px;
+}
+
+.participant-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.participant-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: var(--surface-container-highest);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+}
+
+.participant-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.participant-controls input[type="range"] {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  background: var(--outline-variant);
+  border-radius: 2px;
+  outline: none;
+}
+
+.participant-controls input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--primary);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.portion-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  min-width: 30px;
+}
+
+.status-toggle {
+  color: var(--outline);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.status-toggle.consumed {
+  color: var(--primary);
+}
+
+.status-toggle span {
+  font-size: 20px;
+}

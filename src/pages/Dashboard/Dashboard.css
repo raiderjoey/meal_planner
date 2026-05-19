@@ -124,28 +124,38 @@
 }
 
 .day-content {
-  padding: 16px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
+}
+
+.meal-slot {
+  display: flex;
+  flex-direction: column;
 }
 
 .add-meal-btn {
   background-color: var(--surface-container-low);
-  border: 2px dashed var(--outline-variant);
+  border: 1px dashed var(--outline-variant);
   border-radius: 8px;
-  padding: 12px;
+  padding: 8px;
   color: var(--on-surface-variant);
   font-family: var(--font-headline);
-  font-size: 14px;
+  font-size: 0.75rem;
   font-weight: 600;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  min-height: 64px;
+  min-height: 40px;
+  text-transform: capitalize;
   transition: all 0.2s;
+}
+
+.add-meal-btn .material-symbols-outlined {
+  font-size: 18px;
 }
 
 .add-meal-btn:hover {
