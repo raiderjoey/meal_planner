@@ -20,6 +20,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               Dashboard
             </NavLink>
             <NavLink 
+              to="/recipes" 
+              className="nav-link"
+            >
+              Library
+            </NavLink>
+            <NavLink 
               to="/ingredients" 
               className="nav-link"
             >
