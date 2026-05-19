@@ -54,4 +54,17 @@ describe('parseIngredient', () => {
       ingredient: 'chicken',
     });
   });
+
+  it('should handle ingredients without quantity or unit', () => {
+    expect(parseIngredient('salt')).toEqual({
+      quantity: 0,
+      unit: null,
+      ingredient: 'salt',
+    });
+    expect(parseIngredient('chicken breast')).toEqual({
+      quantity: 0,
+      unit: null,
+      ingredient: 'chicken breast',
+    });
+  });
 });

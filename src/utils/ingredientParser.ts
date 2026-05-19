@@ -14,6 +14,7 @@ const KNOWN_UNITS = [
   'kg', 'kilogram', 'kilograms',
   'ml', 'milliliter', 'milliliters',
   'l', 'liter', 'liters',
+  'pinch', 'dash', 'clove', 'cloves', 'can', 'packet',
 ];
 
 const WORD_NUMBERS: Record<string, number> = {
@@ -41,11 +42,11 @@ function parseNumber(input: string): number {
 }
 
 export function parseIngredient(input: string): ParsedIngredient {
-  const parts = input.trim().split(/\s+/);
-  if (parts.length === 0) {
+  if (!input.trim()) {
     return { quantity: 0, unit: null, ingredient: '' };
   }
 
+  const parts = input.trim().split(/\s+/);
   const firstPart = parts[0].toLowerCase();
   let quantity = parseNumber(firstPart);
   let unit: string | null = null;
@@ -56,11 +57,12 @@ export function parseIngredient(input: string): ParsedIngredient {
       quantity = WORD_NUMBERS[firstPart];
     } else {
       quantity = 0;
+      ingredientStartIdx = 0;
     }
   }
 
   // Check if the second part is a fraction (e.g., "1 1/2")
-  if (parts.length > 1 && parts[1].includes('/')) {
+  if (ingredientStartIdx === 1 && parts.length > 1 && parts[1].includes('/')) {
     const fraction = parseNumber(parts[1]);
     if (!isNaN(fraction)) {
       quantity += fraction;
