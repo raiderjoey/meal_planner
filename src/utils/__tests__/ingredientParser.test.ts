@@ -5,7 +5,7 @@ describe('parseIngredient', () => {
   it('should parse standard quantity, unit, and ingredient', () => {
     expect(parseIngredient('1.5 lbs chicken breast')).toEqual({
       quantity: 1.5,
-      unit: 'lbs',
+      unit: 'lb',
       ingredient: 'chicken breast',
     });
   });
@@ -13,7 +13,7 @@ describe('parseIngredient', () => {
   it('should parse cup measurements', () => {
     expect(parseIngredient('2 cups chopped kale')).toEqual({
       quantity: 2,
-      unit: 'cups',
+      unit: 'cup',
       ingredient: 'chopped kale',
     });
   });
@@ -50,7 +50,7 @@ describe('parseIngredient', () => {
   it('should parse mixed fraction quantities', () => {
     expect(parseIngredient('1 1/2 lbs chicken')).toEqual({
       quantity: 1.5,
-      unit: 'lbs',
+      unit: 'lb',
       ingredient: 'chicken',
     });
   });
@@ -65,6 +65,53 @@ describe('parseIngredient', () => {
       quantity: 0,
       unit: null,
       ingredient: 'chicken breast',
+    });
+  });
+
+  it('should handle quantities attached to units', () => {
+    expect(parseIngredient('1lb chicken')).toEqual({
+      quantity: 1,
+      unit: 'lb',
+      ingredient: 'chicken',
+    });
+  });
+
+  it('should handle "of" noise words', () => {
+    expect(parseIngredient('1 cup of sugar')).toEqual({
+      quantity: 1,
+      unit: 'cup',
+      ingredient: 'sugar',
+    });
+    expect(parseIngredient('2 tablespoons of olive oil')).toEqual({
+      quantity: 2,
+      unit: 'tablespoon',
+      ingredient: 'olive oil',
+    });
+  });
+
+  it('should normalize units to singular form', () => {
+    expect(parseIngredient('2 cups flour')).toEqual({
+      quantity: 2,
+      unit: 'cup',
+      ingredient: 'flour',
+    });
+    expect(parseIngredient('1.5 lbs beef')).toEqual({
+      quantity: 1.5,
+      unit: 'lb',
+      ingredient: 'beef',
+    });
+  });
+
+  it('should handle empty strings', () => {
+    expect(parseIngredient('')).toEqual({
+      quantity: 0,
+      unit: null,
+      ingredient: '',
+    });
+    expect(parseIngredient('   ')).toEqual({
+      quantity: 0,
+      unit: null,
+      ingredient: '',
     });
   });
 });

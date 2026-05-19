@@ -1,0 +1,98 @@
+.ingredient-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.ingredient-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.ingredient-input:focus {
+  outline: none;
+  border-color: var(--primary-green, #4c6151);
+}
+
+.add-button {
+  padding: 0 24px;
+  background-color: var(--primary-green, #4c6151);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.add-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.parsed-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: #f8faf9;
+  border-radius: 8px;
+  border: 1px dashed #ced4da;
+}
+
+.preview-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+}
+
+.preview-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.chip.quantity {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.chip.unit {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.chip.ingredient {
+  background-color: #fff3e0;
+  color: #ef6c00;
+}
+
+.chip.placeholder {
+  color: #adb5bd;
+  font-style: italic;
+}
+
+.interactive-correction-hint {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: #adb5bd;
+}
