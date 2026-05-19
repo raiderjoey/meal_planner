@@ -6,7 +6,8 @@ CREATE TABLE recipes (
   instructions text,
   image_url text,
   created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
+  updated_at timestamptz DEFAULT now(),
+  UNIQUE (id, household_id)
 );
 
 -- Ingredients table
@@ -24,6 +25,7 @@ CREATE TABLE ingredients (
   unit text,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now(),
+  UNIQUE (id, household_id),
   UNIQUE (household_id, name)
 );
 
@@ -31,11 +33,13 @@ CREATE TABLE ingredients (
 CREATE TABLE recipe_ingredients (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   household_id uuid REFERENCES households NOT NULL, -- Denormalized for RLS
-  recipe_id uuid REFERENCES recipes ON DELETE CASCADE NOT NULL,
-  ingredient_id uuid REFERENCES ingredients ON DELETE CASCADE NOT NULL,
+  recipe_id uuid NOT NULL,
+  ingredient_id uuid NOT NULL,
   quantity numeric NOT NULL,
   unit text,
   created_at timestamptz DEFAULT now(),
+  FOREIGN KEY (recipe_id, household_id) REFERENCES recipes(id, household_id) ON DELETE CASCADE,
+  FOREIGN KEY (ingredient_id, household_id) REFERENCES ingredients(id, household_id) ON DELETE CASCADE,
   UNIQUE (recipe_id, ingredient_id)
 );
 
@@ -49,18 +53,21 @@ CREATE TABLE meals (
   planned_at date NOT NULL,
   consumed_at timestamptz,
   created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
+  updated_at timestamptz DEFAULT now(),
+  UNIQUE (id, household_id)
 );
 
 -- Meal Ingredients (Junction table for standalone additions to a meal)
 CREATE TABLE meal_ingredients (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   household_id uuid REFERENCES households NOT NULL, -- Denormalized for RLS
-  meal_id uuid REFERENCES meals ON DELETE CASCADE NOT NULL,
-  ingredient_id uuid REFERENCES ingredients ON DELETE CASCADE NOT NULL,
+  meal_id uuid NOT NULL,
+  ingredient_id uuid NOT NULL,
   quantity numeric NOT NULL,
   unit text,
   created_at timestamptz DEFAULT now(),
+  FOREIGN KEY (meal_id, household_id) REFERENCES meals(id, household_id) ON DELETE CASCADE,
+  FOREIGN KEY (ingredient_id, household_id) REFERENCES ingredients(id, household_id) ON DELETE CASCADE,
   UNIQUE (meal_id, ingredient_id)
 );
 
@@ -68,11 +75,13 @@ CREATE TABLE meal_ingredients (
 CREATE TABLE user_meal_portions (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   household_id uuid REFERENCES households NOT NULL, -- Denormalized for RLS
-  meal_id uuid REFERENCES meals ON DELETE CASCADE NOT NULL,
-  profile_id uuid REFERENCES profiles ON DELETE CASCADE NOT NULL,
+  meal_id uuid NOT NULL,
+  profile_id uuid NOT NULL,
   portion_size numeric NOT NULL DEFAULT 1.0,
   consumed_at timestamptz,
   created_at timestamptz DEFAULT now(),
+  FOREIGN KEY (meal_id, household_id) REFERENCES meals(id, household_id) ON DELETE CASCADE,
+  FOREIGN KEY (profile_id, household_id) REFERENCES profiles(id, household_id) ON DELETE CASCADE,
   UNIQUE (meal_id, profile_id)
 );
 
@@ -80,12 +89,13 @@ CREATE TABLE user_meal_portions (
 CREATE TABLE pantry_items (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   household_id uuid REFERENCES households NOT NULL,
-  ingredient_id uuid REFERENCES ingredients ON DELETE CASCADE NOT NULL,
+  ingredient_id uuid NOT NULL,
   quantity numeric DEFAULT 0,
   unit text,
   is_in_stock boolean DEFAULT true,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now(),
+  FOREIGN KEY (ingredient_id, household_id) REFERENCES ingredients(id, household_id) ON DELETE CASCADE,
   UNIQUE (household_id, ingredient_id)
 );
 

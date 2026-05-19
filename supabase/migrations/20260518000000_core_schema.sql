@@ -13,7 +13,8 @@ CREATE TABLE profiles (
   household_id uuid REFERENCES households ON DELETE SET NULL,
   full_name text,
   avatar_url text,
-  updated_at timestamptz DEFAULT now()
+  updated_at timestamptz DEFAULT now(),
+  UNIQUE (id, household_id)
 );
 
 -- Add index for performance
@@ -51,10 +52,29 @@ CREATE POLICY "Users can manage their own household" ON households
   FOR ALL USING (id = get_current_user_household_id());
 
 -- Policies for Profiles
-CREATE POLICY "Users can manage their own profile" ON profiles
-  FOR ALL USING (auth.uid() = id);
+CREATE POLICY "Users can view their own profile" ON profiles
+  FOR SELECT USING (auth.uid() = id);
+
+CREATE POLICY "Users can update their own profile fields" ON profiles
+  FOR UPDATE USING (auth.uid() = id)
+  WITH CHECK (
+    auth.uid() = id AND 
+    (household_id IS NOT DISTINCT FROM (SELECT household_id FROM profiles WHERE id = auth.uid()))
+  );
 
 CREATE POLICY "Users can view household members" ON profiles
   FOR SELECT USING (
     household_id = get_current_user_household_id()
   );
+
+-- Function for atomic household creation
+CREATE OR REPLACE FUNCTION create_household(household_name text)
+RETURNS households AS $$
+DECLARE
+  new_household households;
+BEGIN
+  INSERT INTO households (name) VALUES (household_name) RETURNING * INTO new_household;
+  UPDATE profiles SET household_id = new_household.id WHERE id = auth.uid();
+  RETURN new_household;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
