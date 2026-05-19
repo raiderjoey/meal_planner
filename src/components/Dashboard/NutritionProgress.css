@@ -1,0 +1,80 @@
+.nutrition-progress {
+  padding: 12px;
+  background-color: var(--surface-container-low);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.progress-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+}
+
+.dual-progress-bar {
+  height: 8px;
+  background-color: var(--surface-container-highest);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.bar-planned {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: var(--tertiary-fixed-dim);
+  transition: width 0.3s ease;
+}
+
+.bar-consumed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: var(--primary);
+  transition: width 0.3s ease;
+}
+
+.macro-progress {
+  display: flex;
+  gap: 8px;
+}
+
+.macro-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.macro-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--tertiary);
+}
+
+.macro-bar {
+  flex: 1;
+  height: 4px;
+  background-color: var(--surface-container-highest);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.macro-fill {
+  height: 100%;
+  background-color: var(--secondary);
+  transition: width 0.3s ease;
+}
