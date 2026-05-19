@@ -10,7 +10,20 @@ CREATE POLICY "Edit shared household collections" ON collections FOR UPDATE
   USING (household_id = get_current_user_household_id() AND is_shared_with_household = true AND can_household_edit = true);
 
 -- Junctions: Restricted by parent collection access
-CREATE POLICY "Manage collection recipes" ON collection_recipes FOR ALL
+-- Drop the restrictive "FOR ALL" policy
+DROP POLICY "Manage collection recipes" ON collection_recipes;
+
+-- Split into View vs Modify
+CREATE POLICY "View collection recipes" ON collection_recipes FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM collections c 
+      WHERE c.id = collection_id 
+      AND (c.user_id = auth.uid() OR (c.household_id = get_current_user_household_id() AND c.is_shared_with_household = true))
+    )
+  );
+
+CREATE POLICY "Modify collection recipes" ON collection_recipes FOR INSERT, UPDATE, DELETE
   USING (
     EXISTS (
       SELECT 1 FROM collections c 
