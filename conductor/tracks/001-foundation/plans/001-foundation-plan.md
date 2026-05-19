@@ -256,10 +256,10 @@ git commit -m "feat: add recipes and meals schema with household RLS"
 - Create: `src/pages/Dashboard/Dashboard.tsx`
 - Create: `src/components/Layout/MainLayout.css`
 
-- [ ] **Step 1: Create MainLayout using existing design patterns**
+- [x] **Step 1: Create MainLayout using existing design patterns**
 Use the CSS variables and classes from `ui_designs/dashboard_desktop.html`.
 
-- [ ] **Step 2: Implement Dashboard Page**
+- [x] **Step 2: Implement Dashboard Page**
 ```tsx
 // src/pages/Dashboard/Dashboard.tsx
 import React from 'react';
@@ -276,7 +276,7 @@ const Dashboard = () => {
 export default Dashboard;
 ```
 
-- [ ] **Step 3: Commit Layout**
+- [x] **Step 3: Commit Layout**
 ```bash
 git add src/components/ src/pages/
 git commit -m "feat: add main layout and dashboard shell"
