@@ -16,11 +16,31 @@ CREATE TABLE profiles (
   updated_at timestamptz DEFAULT now()
 );
 
+-- Add index for performance
+CREATE INDEX idx_profiles_household_id ON profiles(household_id);
+
+-- Updated_at trigger function
+CREATE OR REPLACE FUNCTION handle_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER on_profile_update
+  BEFORE UPDATE ON profiles
+  FOR EACH ROW
+  EXECUTE PROCEDURE handle_updated_at();
+
 -- Enable RLS
 ALTER TABLE households ENABLE ROW LEVEL SECURITY;
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
 -- Policies for Households
+CREATE POLICY "Authenticated users can create a household" ON households
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
 CREATE POLICY "Users can view their own household" ON households
   FOR SELECT USING (
     id IN (
@@ -36,12 +56,19 @@ CREATE POLICY "Users can update their own household" ON households
   );
 
 -- Policies for Profiles
-CREATE POLICY "Profiles are viewable by household members" ON profiles
+CREATE POLICY "Users can insert their own profile" ON profiles
+  FOR INSERT WITH CHECK (auth.uid() = id);
+
+CREATE POLICY "Users can view their own profile" ON profiles
+  FOR SELECT USING (auth.uid() = id);
+
+CREATE POLICY "Users can view household members" ON profiles
   FOR SELECT USING (
+    household_id IS NOT NULL AND 
     household_id IN (
-      SELECT household_id FROM profiles WHERE id = auth.uid()
+      SELECT p.household_id FROM profiles p WHERE p.id = auth.uid()
     )
   );
 
 CREATE POLICY "Users can update their own profile" ON profiles
-  FOR UPDATE USING (id = auth.uid());
+  FOR UPDATE USING (auth.uid() = id);
