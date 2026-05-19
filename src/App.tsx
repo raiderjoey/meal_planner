@@ -4,6 +4,7 @@ import MainLayout from './components/Layout/MainLayout';
 import Dashboard from './pages/Dashboard/Dashboard';
 import RecipeLibrary from './pages/Recipes/RecipeLibrary';
 import RecipeCreator from './pages/Recipes/RecipeCreator';
+import ShoppingList from './pages/ShoppingList/ShoppingList';
 
 function App() {
   return (
@@ -14,7 +15,7 @@ function App() {
           <Route path="/recipes" element={<RecipeLibrary />} />
           <Route path="/recipes/new" element={<RecipeCreator />} />
           <Route path="/ingredients" element={<div>Ingredients Page (Coming Soon)</div>} />
-          <Route path="/shopping-list" element={<div>Shopping List Page (Coming Soon)</div>} />
+          <Route path="/shopping-list" element={<ShoppingList />} />
         </Routes>
       </MainLayout>
     </Router>
