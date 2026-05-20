@@ -33,3 +33,6 @@ agents/
 AGENTS.md
 .worktrees/
 worktrees/
+
+supabase/.branches
+supabase/.temp
