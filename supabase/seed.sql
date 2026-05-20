@@ -1,0 +1,2 @@
+-- Seed data for HarvestPlan
+-- This file is executed after the schema is initialized.
