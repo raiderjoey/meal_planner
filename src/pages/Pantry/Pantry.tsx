@@ -41,7 +41,13 @@ const Pantry: React.FC = () => {
     if (!confirm('Are you sure you want to remove this item from your pantry?')) return;
     
     try {
-      const { error } = await supabase.from('pantry_items').delete().eq('id', id);
+      const { data: householdId } = await supabase.rpc('get_current_user_household_id');
+      const { error } = await supabase
+        .from('pantry_items')
+        .delete()
+        .eq('id', id)
+        .eq('household_id', householdId);
+      
       if (error) throw error;
       setItems(items.filter(item => item.id !== id));
     } catch (error) {
@@ -58,7 +64,8 @@ const Pantry: React.FC = () => {
     nutrition: Nutrition;
   }) => {
     try {
-      const { data: householdId } = await supabase.rpc('get_current_user_household_id');
+      const { data: householdId, error: houseError } = await supabase.rpc('get_current_user_household_id');
+      if (houseError) throw houseError;
       
       // 1. Ensure ingredient exists
       const { data: ingredient, error: ingError } = await supabase

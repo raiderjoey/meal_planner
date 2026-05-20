@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { BrowserRouter } from 'react-router-dom';
 import Pantry from '../Pantry';
@@ -80,7 +80,7 @@ describe('Pantry Page', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Apple')).toBeInTheDocument();
-      expect(screen.getByText('Milk')).toBeInTheDocument();
+      expect(screen.getAllByText('Milk')[0]).toBeInTheDocument();
     });
 
     expect(screen.getByText(/Produce \(1\)/i)).toBeInTheDocument();
@@ -98,8 +98,12 @@ describe('Pantry Page', () => {
       expect(screen.getByText(/Low Stock Alerts/i)).toBeInTheDocument();
     });
 
-    expect(screen.getByText(/Milk/i)).toBeInTheDocument();
-    expect(screen.queryByText(/Apple/i)).not.toBeInTheDocument(); // Apple is not low stock
+    const alertsSection = screen.getByRole('heading', { name: /low stock alerts/i }).closest('.low-stock-alerts');
+    expect(alertsSection).toBeInTheDocument();
+    
+    const { getByText, queryByText } = within(alertsSection as HTMLElement);
+    expect(getByText(/Milk/i)).toBeInTheDocument();
+    expect(queryByText(/Apple/i)).not.toBeInTheDocument(); // Apple is not low stock
   });
 
   it('filters items by search query', async () => {
@@ -116,7 +120,7 @@ describe('Pantry Page', () => {
     const searchInput = screen.getByPlaceholderText(/Search pantry.../i);
     fireEvent.change(searchInput, { target: { value: 'Milk' } });
 
-    expect(screen.getByText('Milk')).toBeInTheDocument();
+    expect(screen.getAllByText('Milk')[0]).toBeInTheDocument();
     expect(screen.queryByText('Apple')).not.toBeInTheDocument();
   });
 
