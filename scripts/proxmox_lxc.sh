@@ -60,7 +60,6 @@ echo -e "${YL}---------------------${NC}"
 # Default settings
 CORES=2
 RAM=2048
-DISK=8
 BR=vmbr0
 IP="dhcp"
 TEMPLATE_STORAGE="local"
