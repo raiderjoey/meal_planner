@@ -61,7 +61,7 @@ echo -e "${YL}Updating Proxmox template list...${NC}"
 pveam update >/dev/null
 
 echo -e "${YL}Selecting Debian 12 template...${NC}"
-TEMPLATE_NAME=$(pveam available | grep "debian-12" | head -n1 | awk '{print $NF}')
+TEMPLATE_NAME=$(pveam available | grep -oP "debian-12-standard_[^\s]+" | head -n1)
 if [ -z "$TEMPLATE_NAME" ]; then
   echo -e "${RD}Error: Could not find a Debian 12 template in the available list.${NC}"
   exit 1
@@ -73,7 +73,7 @@ if ! pveam list $TEMPLATE_STORAGE | grep -q "$(basename $TEMPLATE_NAME)"; then
 fi
 
 # Find the actual template file name in storage
-TEMPLATE_FILE=$(pveam list $TEMPLATE_STORAGE | grep "debian-12" | head -n1 | awk '{print $1}')
+TEMPLATE_FILE=$(pveam list $TEMPLATE_STORAGE | grep -oP "debian-12-standard_[^\s]+" | head -n1)
 
 
 echo -e "${YL}Creating LXC Container ${CTID} (${CTNAME})...${NC}"
