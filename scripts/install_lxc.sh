@@ -66,11 +66,9 @@ fi
 chown -R harvest:harvest "$INSTALL_DIR"
 cd "$INSTALL_DIR"
 
-# 7. Install NPM Dependencies and Build
+# 7. Install NPM Dependencies
 echo "Installing NPM dependencies..."
 sudo -u harvest -H /usr/bin/npm install
-echo "Building frontend..."
-sudo -u harvest -H /usr/bin/npm run build
 
 # 8. Initialize Backend
 echo "Starting Supabase backend (this may take a few minutes)..."
@@ -94,8 +92,27 @@ if command -v supabase &> /dev/null; then
 else
   STATUS=$(sudo -u harvest -H -E npx --yes supabase status)
 fi
+
 API_URL=$(echo "$STATUS" | grep "API URL" | awk '{print $3}')
 ANON_KEY=$(echo "$STATUS" | grep "anon key" | awk '{print $3}')
+
+if [ -z "$API_URL" ] || [ -z "$ANON_KEY" ]; then
+  echo "Error: Could not extract Supabase API URL or Anon Key."
+  echo "Status output was:"
+  echo "$STATUS"
+  exit 1
+fi
+
+# Fix API_URL to use the container's IP instead of localhost/127.0.0.1
+# This is required so that browsers on other machines can reach the API
+LXC_IP=$(ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -n1)
+if [ -n "$LXC_IP" ]; then
+  echo "Detected LXC IP: $LXC_IP"
+  API_URL=$(echo "$API_URL" | sed "s/127.0.0.1/$LXC_IP/")
+  API_URL=$(echo "$API_URL" | sed "s/localhost/$LXC_IP/")
+fi
+
+echo "Using API URL: $API_URL"
 
 cat <<EOF > .env
 VITE_SUPABASE_URL=$API_URL
@@ -103,7 +120,11 @@ VITE_SUPABASE_ANON_KEY=$ANON_KEY
 EOF
 chown harvest:harvest .env
 
-# 10. Configure Nginx and systemd services
+# 10. Build frontend
+echo "Building frontend..."
+sudo -u harvest -H /usr/bin/npm run build
+
+# 11. Configure Nginx and systemd services
 
 echo "Configuring Nginx..."
 cat <<EOF > /etc/nginx/sites-available/harvestplan

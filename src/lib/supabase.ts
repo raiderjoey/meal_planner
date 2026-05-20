@@ -5,7 +5,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase environment variables are missing.');
+  console.error('Supabase environment variables are missing. If this is a production build, the .env file must be present BEFORE running the build command.');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
