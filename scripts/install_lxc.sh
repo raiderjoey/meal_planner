@@ -80,11 +80,20 @@ service docker start || true
 usermod -aG docker harvest
 
 export SUPABASE_TELEMETRY_DISABLED=1
-sudo -u harvest -H -E /usr/bin/npx supabase start
+# Use the global supabase binary if available, otherwise use npx with --yes
+if command -v supabase &> /dev/null; then
+  sudo -u harvest -H -E supabase start
+else
+  sudo -u harvest -H -E npx --yes supabase start
+fi
 
 # 9. Extract URL and Anon Key and create .env
 echo "Configuring environment variables..."
-STATUS=$(sudo -u harvest -H -E /usr/bin/npx supabase status)
+if command -v supabase &> /dev/null; then
+  STATUS=$(sudo -u harvest -H -E supabase status)
+else
+  STATUS=$(sudo -u harvest -H -E npx --yes supabase status)
+fi
 API_URL=$(echo "$STATUS" | grep "API URL" | awk '{print $3}')
 ANON_KEY=$(echo "$STATUS" | grep "anon key" | awk '{print $3}')
 
