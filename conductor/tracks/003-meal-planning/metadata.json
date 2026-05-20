@@ -1,9 +1,0 @@
-{
-  "id": "003-meal-planning",
-  "status": "completed",
-  "description": "Meal scheduling, standalone meals, and nutrition scaling.",
-  "audits": {
-    "plan": "approved",
-    "final": "approved"
-  }
-}

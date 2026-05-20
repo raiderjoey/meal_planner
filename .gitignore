@@ -24,6 +24,7 @@ dist-ssr
 *.sw?
 
 # Conductor / Agentic
+conductor/
 .superpowers/
 docs/maestro/
 

@@ -44,6 +44,22 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
+## 📦 Proxmox LXC Installation
+
+For Proxmox users, you can install HarvestPlan in a dedicated Debian 12 LXC container using the following one-liner:
+
+```bash
+bash -c "$(curl -sSL https://raw.githubusercontent.com/raiderjoey/meal_planner/main/scripts/proxmox_lxc.sh)"
+```
+
+### Requirements
+- **Proxmox VE Host**
+- **Minimum Resources**: 2 vCPUs, 2GB RAM, 8GB Disk.
+- **LXC Features**: Nesting and Keyctl must be enabled (the script handles this automatically).
+- **Unprivileged Container**: Supported and recommended.
+
+---
+
 ## 🏗️ Architecture & Protocol
 
 ### Tech Stack
