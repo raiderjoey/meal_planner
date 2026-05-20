@@ -1,0 +1,75 @@
+.low-stock-alerts {
+  background-color: var(--error-container);
+  color: var(--error);
+  padding: 16px;
+  border-radius: var(--border-radius);
+  margin-bottom: 24px;
+}
+
+.alerts-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.alerts-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.alert-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+}
+
+.alert-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.item-quantity {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.add-to-list-btn {
+  background-color: var(--error);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.add-to-list-btn:hover {
+  opacity: 0.9;
+}
+
+@media (min-width: 768px) {
+  .alerts-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .alert-item {
+    flex: 1 1 calc(33.333% - 16px);
+    min-width: 250px;
+  }
+}
