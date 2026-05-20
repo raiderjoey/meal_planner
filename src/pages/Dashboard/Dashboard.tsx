@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import MealInstanceCard from '../../components/Dashboard/MealInstanceCard';
+import SummaryDayCard from '../../components/Dashboard/SummaryDayCard';
 import AddMealModal from '../../components/Dashboard/AddMealModal';
-import NutritionProgress from '../../components/Dashboard/NutritionProgress';
 import { useHousehold } from '../../contexts/HouseholdContext';
 import { supabase } from '../../lib/supabase';
-import { MealPlan, MealParticipant, Profile, MealType, ParticipationStatus, Nutrition } from '../../types/database';
-import { calculateTotalNutrition } from '../../utils/nutritionCalculator';
+import { MealPlan, Profile, MealType } from '../../types/database';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
-  const { household, profile } = useHousehold();
+  const { household } = useHousehold();
   const [meals, setMeals] = useState<MealPlan[]>([]);
-  const [participants, setParticipants] = useState<MealParticipant[]>([]);
   const [householdProfiles, setHouseholdProfiles] = useState<Profile[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [activeSlot, setActiveSlot] = useState<{ date: string; type: MealType } | null>(null);
@@ -25,8 +22,6 @@ const Dashboard: React.FC = () => {
     { name: 'Sat', date: '2026-05-23' },
     { name: 'Sun', date: '2026-05-24' },
   ];
-
-  const mealTypes: MealType[] = ['breakfast', 'lunch', 'dinner'];
 
   useEffect(() => {
     if (household) {
@@ -44,57 +39,16 @@ const Dashboard: React.FC = () => {
       .eq('household_id', household.id);
     
     if (profiles) setHouseholdProfiles(profiles);
-  };
 
-  const getDailyNutrition = (date: string) => {
-    const dayMeals = meals.filter(m => m.scheduled_date === date);
-    
-    const initial: Nutrition = { calories: 0, protein: 0, fat: 0, carbs: 0, fiber: 0 };
-    
-    const planned = dayMeals.reduce((acc, meal) => {
-      const mealParts = participants.filter(p => p.meal_plan_id === meal.id);
-      // Mock base nutrition for now if it's a standalone meal without data
-      const base = meal.standalone_data?.nutrition || { calories: 500, protein: 20, fat: 15, carbs: 60 };
-      const scaled = calculateTotalNutrition(base, mealParts);
-      
-      return {
-        calories: acc.calories + scaled.calories,
-        protein: acc.protein + scaled.protein,
-        fat: acc.fat + scaled.fat,
-        carbs: acc.carbs + scaled.carbs,
-        fiber: (acc.fiber || 0) + (scaled.fiber || 0)
-      };
-    }, initial);
+    // Fetch meals for the week
+    const { data: mealData } = await supabase
+      .from('meal_plans')
+      .select('*')
+      .eq('household_id', household.id)
+      .gte('scheduled_date', days[0].date)
+      .lte('scheduled_date', days[6].date);
 
-    const consumed = dayMeals.reduce((acc, meal) => {
-      const mealParts = participants.filter(p => p.meal_plan_id === meal.id && p.status === 'consumed');
-      if (mealParts.length === 0) return acc;
-      
-      const base = meal.standalone_data?.nutrition || { calories: 500, protein: 20, fat: 15, carbs: 60 };
-      const scaled = calculateTotalNutrition(base, mealParts);
-      
-      return {
-        calories: acc.calories + scaled.calories,
-        protein: acc.protein + scaled.protein,
-        fat: acc.fat + scaled.fat,
-        carbs: acc.carbs + scaled.carbs,
-        fiber: (acc.fiber || 0) + (scaled.fiber || 0)
-      };
-    }, initial);
-
-    return { planned, consumed };
-  };
-
-  const handleStatusToggle = (mealId: string, userId: string, status: ParticipationStatus) => {
-    setParticipants(prev => prev.map(p => 
-      (p.meal_plan_id === mealId && p.user_id === userId) ? { ...p, status } : p
-    ));
-  };
-
-  const handlePortionChange = (mealId: string, userId: string, multiplier: number) => {
-    setParticipants(prev => prev.map(p => 
-      (p.meal_plan_id === mealId && p.user_id === userId) ? { ...p, portion_multiplier: multiplier } : p
-    ));
+    if (mealData) setMeals(mealData);
   };
 
   return (
@@ -116,56 +70,13 @@ const Dashboard: React.FC = () => {
       </section>
 
       <div className="weekly-grid">
-        {days.map((day) => {
-          const { planned, consumed } = getDailyNutrition(day.date);
-          
-          return (
-            <div 
-              key={day.date} 
-              className={`day-card ${day.isToday ? 'is-today' : ''} meal-card-shadow`}
-            >
-              <div className="day-header">
-                <p className="day-name">{day.name}</p>
-                <p className="day-date">{day.date.split('-')[2]}</p>
-                {day.isToday && <span className="today-badge">TODAY</span>}
-              </div>
-              <div className="day-content">
-                <NutritionProgress planned={planned} consumed={consumed} />
-                
-                {mealTypes.map(type => {
-                  const dayMeals = meals.filter(m => m.scheduled_date === day.date && m.meal_type === type);
-                  
-                  return (
-                    <div key={type} className="meal-slot">
-                      {dayMeals.length > 0 ? (
-                        dayMeals.map(meal => (
-                          <MealInstanceCard
-                            key={meal.id}
-                            meal={meal}
-                            participants={participants.filter(p => p.meal_plan_id === meal.id)}
-                            onStatusToggle={(uid, status) => handleStatusToggle(meal.id, uid, status)}
-                            onPortionChange={(uid, mult) => handlePortionChange(meal.id, uid, mult)}
-                          />
-                        ))
-                      ) : (
-                        <button 
-                          className="add-meal-btn"
-                          onClick={() => {
-                            setActiveSlot({ date: day.date, type });
-                            setIsAddModalOpen(true);
-                          }}
-                        >
-                          <span className="material-symbols-outlined">add</span>
-                          {type}
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
+        {days.map((day) => (
+          <SummaryDayCard 
+            key={day.date} 
+            day={day} 
+            meals={meals.filter(m => m.scheduled_date === day.date)} 
+          />
+        ))}
       </div>
 
       {isAddModalOpen && activeSlot && (
@@ -187,22 +98,18 @@ const Dashboard: React.FC = () => {
             };
             
             setMeals(prev => [...prev, newMeal]);
-            
-            const newParticipants: MealParticipant[] = data.participants.map(p => ({
-              household_id: household?.id || '',
-              meal_plan_id: newMeal.id,
-              user_id: p.user_id,
-              portion_multiplier: p.portion_multiplier,
-              status: 'planned'
-            }));
-            
-            setParticipants(prev => [...prev, ...newParticipants]);
             setIsAddModalOpen(false);
           }}
         />
       )}
 
-      <button className="fab">
+      <button 
+        className="fab"
+        onClick={() => {
+          setActiveSlot({ date: days.find(d => d.isToday)?.date || days[0].date, type: 'dinner' });
+          setIsAddModalOpen(true);
+        }}
+      >
         <span className="material-symbols-outlined">add</span>
       </button>
     </div>
@@ -210,3 +117,4 @@ const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
+

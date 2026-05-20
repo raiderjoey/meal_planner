@@ -11,6 +11,16 @@ export interface Profile {
   avatar_url?: string;
 }
 
+export interface Recipe {
+  id: string;
+  household_id: string;
+  title: string;
+  instructions: string | null;
+  image_url?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'dessert' | 'drinks' | 'snacks';
 export type ParticipationStatus = 'planned' | 'consumed';
 
