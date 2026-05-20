@@ -17,5 +17,3 @@ enable_signup = true
 [storage]
 enabled = true
 
-[functions]
-enabled = true
