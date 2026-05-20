@@ -75,6 +75,7 @@ fi
 # Find the actual template file name in storage
 TEMPLATE_FILE=$(pveam list $TEMPLATE_STORAGE | grep "debian-12" | head -n1 | awk '{print $1}')
 
+
 echo -e "${YL}Creating LXC Container ${CTID} (${CTNAME})...${NC}"
 pct create $CTID $TEMPLATE_STORAGE:vztmpl/$(basename $TEMPLATE_FILE) \
   --hostname $CTNAME \
