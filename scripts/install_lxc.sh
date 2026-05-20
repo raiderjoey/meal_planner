@@ -53,7 +53,11 @@ if ! id "harvest" &>/dev/null; then
 fi
 
 echo "Cloning repository..."
-git clone "$REPO_URL" "$INSTALL_DIR"
+if [ -n "$GITHUB_TOKEN" ]; then
+  git clone "https://${GITHUB_TOKEN}@github.com/raiderjoey/meal_planner.git" "$INSTALL_DIR"
+else
+  git clone "$REPO_URL" "$INSTALL_DIR"
+fi
 chown -R harvest:harvest "$INSTALL_DIR"
 cd "$INSTALL_DIR"
 
