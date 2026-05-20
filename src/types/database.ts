@@ -43,3 +43,26 @@ export interface MealParticipant {
   portion_multiplier: number;
   status: ParticipationStatus;
 }
+
+export interface AdHocShoppingItem {
+  id: string;
+  household_id: string;
+  ingredient_id?: string;
+  name: string;
+  quantity: number;
+  unit?: string;
+  is_resolved: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ShoppingListItem {
+  ingredient_id: string | null;
+  ad_hoc_id: string | null;
+  name: string;
+  required_quantity: number;
+  pantry_quantity: number;
+  buy_quantity: number;
+  unit: string | null;
+  source: 'recipe' | 'ad_hoc';
+}
