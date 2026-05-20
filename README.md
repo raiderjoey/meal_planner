@@ -71,7 +71,5 @@ npx vitest --ui
 - [x] **Track 001**: Foundation (Auth & Household Context)
 - [x] **Track 002**: Recipe Library
 - [x] **Track 003**: Meal Planning & Scheduling
-- [x] **Track 004**: Shopping List Aggregation
-- [x] **Track 005**: Advanced Pantry Management & Nutrition API
-- [ ] **Track 006**: Prep List & Batch Cooking (Proposed)
-- [ ] **Track 007**: Household Management & Member Invitations (Proposed)
+- [x] **Track 004**: Shopping List Aggregation (Current)
+- [ ] **Track 005**: Advanced Pantry Management & Nutrition API
