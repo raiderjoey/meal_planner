@@ -25,6 +25,7 @@ dist-ssr
 
 # Conductor / Agentic
 .superpowers/
+docs/maestro/
 
 GEMINI.md
 agents/
