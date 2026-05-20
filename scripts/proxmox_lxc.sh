@@ -5,6 +5,11 @@
 
 set -e
 
+# Logging
+LOG_FILE="install.log"
+exec > >(tee -a "$LOG_FILE") 2>&1
+echo "Logging to $LOG_FILE"
+
 # Colors
 RD=$(echo -en "\e[31m")
 GN=$(echo -en "\e[32m")

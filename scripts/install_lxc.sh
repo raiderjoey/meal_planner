@@ -5,6 +5,11 @@
 
 set -e
 
+# Logging
+LOG_FILE="install.log"
+exec > >(tee -a "$LOG_FILE") 2>&1
+echo "Logging to $LOG_FILE"
+
 echo "Starting HarvestPlan Installation..."
 
 # 1. Update System
