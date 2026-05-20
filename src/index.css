@@ -22,6 +22,9 @@
   --tertiary-container: #79746b;
   --on-tertiary-container: #fffbff;
 
+  --error: #ba1a1a;
+  --error-container: #ffdad6;
+
   --font-headline: 'Quicksand', sans-serif;
   --font-body: 'Inter', sans-serif;
 

@@ -20,6 +20,38 @@ export interface Nutrition {
   fat: number;
   carbs: number;
   fiber?: number;
+  sodium?: number;
+  sugar?: number;
+}
+
+export interface Ingredient {
+  id: string;
+  household_id: string;
+  name: string;
+  calories: number;
+  fat: number;
+  sodium: number;
+  protein: number;
+  fiber: number;
+  carbs: number;
+  sugar: number;
+  unit: string;
+  category?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PantryItem {
+  id: string;
+  household_id: string;
+  ingredient_id: string;
+  quantity: number;
+  unit: string;
+  is_in_stock: boolean;
+  low_stock_threshold: number;
+  created_at: string;
+  updated_at: string;
+  ingredient?: Ingredient;
 }
 
 export interface MealPlan {
