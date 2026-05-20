@@ -26,10 +26,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               Library
             </NavLink>
             <NavLink 
-              to="/ingredients" 
+              to="/pantry" 
               className="nav-link"
             >
-              Ingredients
+              Pantry
             </NavLink>
             <NavLink 
               to="/shopping-list" 

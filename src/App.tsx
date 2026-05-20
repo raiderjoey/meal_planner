@@ -16,7 +16,6 @@ function App() {
           <Route path="/recipes" element={<RecipeLibrary />} />
           <Route path="/recipes/new" element={<RecipeCreator />} />
           <Route path="/pantry" element={<Pantry />} />
-          <Route path="/ingredients" element={<div>Ingredients Page (Coming Soon)</div>} />
           <Route path="/shopping-list" element={<ShoppingList />} />
         </Routes>
       </MainLayout>
