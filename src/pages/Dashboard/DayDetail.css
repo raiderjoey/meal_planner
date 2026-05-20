@@ -1,0 +1,66 @@
+.day-detail-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px var(--margin-mobile);
+}
+
+@media (min-width: 1024px) {
+  .day-detail-page {
+    padding: 40px var(--margin-desktop);
+  }
+}
+
+.day-detail-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  margin-top: 24px;
+}
+
+.meals-section h3, .prep-section h3 {
+  font-family: var(--font-headline);
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: var(--on-surface);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.meals-section h3::before {
+  content: 'restaurant';
+  font-family: 'Material Symbols Outlined';
+  font-size: 24px;
+  color: var(--primary);
+}
+
+.prep-section h3::before {
+  content: 'checklist';
+  font-family: 'Material Symbols Outlined';
+  font-size: 24px;
+  color: var(--secondary);
+}
+
+.meals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.loading, .empty-meals {
+  padding: 64px 32px;
+  text-align: center;
+  color: var(--on-surface-variant);
+  background-color: var(--surface-container-low);
+  border-radius: 24px;
+  border: 1px dashed var(--outline-variant);
+  margin-top: 24px;
+}
+
+@media (min-width: 1024px) {
+  .day-detail-content {
+    grid-template-columns: 1.6fr 1fr;
+    align-items: start;
+  }
+}
