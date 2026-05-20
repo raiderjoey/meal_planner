@@ -34,15 +34,23 @@ CREATE POLICY "Insert collection recipes" ON collection_recipes FOR INSERT
     )
   );
 
-CREATE POLICY "Modify collection recipes" ON collection_recipes FOR UPDATE, DELETE
+CREATE POLICY "Update collection recipes" ON collection_recipes FOR UPDATE
   USING (
     EXISTS (
-      SELECT 1 FROM collections c 
-      WHERE c.id = collection_id 
+      SELECT 1 FROM collections c
+      WHERE c.id = collection_id
       AND (c.user_id = auth.uid() OR (c.household_id = get_current_user_household_id() AND c.is_shared_with_household = true AND c.can_household_edit = true))
     )
   );
 
+CREATE POLICY "Delete collection recipes" ON collection_recipes FOR DELETE
+  USING (
+    EXISTS (
+      SELECT 1 FROM collections c
+      WHERE c.id = collection_id
+      AND (c.user_id = auth.uid() OR (c.household_id = get_current_user_household_id() AND c.is_shared_with_household = true AND c.can_household_edit = true))
+    )
+  );
 -- Tags: Household-wide collaborative tagging
 CREATE POLICY "Manage household tags" ON tags FOR ALL
   USING (household_id = get_current_user_household_id());
