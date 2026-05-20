@@ -61,7 +61,7 @@ echo -e "${YL}Updating Proxmox template list...${NC}"
 pveam update >/dev/null
 
 echo -e "${YL}Selecting Debian 12 template...${NC}"
-TEMPLATE_NAME=$(pveam available | grep "debian-12" | head -n1 | awk '{print $2}')
+TEMPLATE_NAME=$(pveam available | grep "debian-12" | head -n1 | awk '{print $1}')
 if [ -z "$TEMPLATE_NAME" ]; then
   echo -e "${RD}Error: Could not find a Debian 12 template in the available list.${NC}"
   exit 1
