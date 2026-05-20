@@ -50,6 +50,9 @@ CTNAME=${CTNAME:-harvestplan}
 read -p "Enter Storage [local-lvm]: " STORAGE
 STORAGE=${STORAGE:-local-lvm}
 
+read -p "Enter Disk Size in GB [16]: " DISK
+DISK=${DISK:-16}
+
 read -s -p "Enter Root Password: " PASSWORD
 echo
 echo -e "${YL}---------------------${NC}"
