@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import SummaryDayCard from '../../components/Dashboard/SummaryDayCard';
 import AddMealModal from '../../components/Dashboard/AddMealModal';
 import { useHousehold } from '../../contexts/HouseholdContext';
+import { useSystemVersion } from '../../hooks/useSystemVersion';
 import { supabase } from '../../lib/supabase';
 import { MealPlan, Profile, MealType } from '../../types/database';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
   const { household } = useHousehold();
+  const { version } = useSystemVersion();
   const [meals, setMeals] = useState<MealPlan[]>([]);
   const [householdProfiles, setHouseholdProfiles] = useState<Profile[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -112,6 +114,12 @@ const Dashboard: React.FC = () => {
       >
         <span className="material-symbols-outlined">add</span>
       </button>
+
+      <footer className="dashboard-footer">
+        <span className="version-text">
+          {version ? `v${version}` : '...'}
+        </span>
+      </footer>
     </div>
   );
 };
