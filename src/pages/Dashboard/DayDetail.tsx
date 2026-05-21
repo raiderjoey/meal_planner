@@ -3,21 +3,45 @@ import { useParams } from 'react-router-dom';
 import DayHeader from '../../components/Dashboard/DayHeader';
 import DetailMealCard from '../../components/Dashboard/DetailMealCard';
 import PrepList from '../../components/Dashboard/PrepList';
+import AddMealModal from '../../components/Dashboard/AddMealModal';
+import { useHousehold } from '../../contexts/HouseholdContext';
 import { useMealPlanning } from '../../hooks/useMealPlanning';
+import { supabase } from '../../lib/supabase';
 import { PrepTask } from '../../types/dashboard';
+import { Profile } from '../../types/database';
 import { getPrepTasks } from '../../utils/prepAggregator';
 import './DayDetail.css';
 
 const DayDetail: React.FC = () => {
   const { date } = useParams<{ date: string }>();
+  const { household } = useHousehold();
   
   const dateRange = useMemo(() => ({
     start: date || '',
     end: date || ''
   }), [date]);
 
-  const { meals, isLoading } = useMealPlanning(dateRange);
+  const { meals, addMeal, isLoading } = useMealPlanning(dateRange);
   const [prepTasks, setPrepTasks] = useState<PrepTask[]>([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [householdProfiles, setHouseholdProfiles] = useState<Profile[]>([]);
+
+  useEffect(() => {
+    if (household) {
+      fetchProfiles();
+    }
+  }, [household]);
+
+  const fetchProfiles = async () => {
+    if (!household) return;
+
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('household_id', household.id);
+    
+    if (profiles) setHouseholdProfiles(profiles);
+  };
 
   useEffect(() => {
     if (meals.length > 0) {
@@ -67,6 +91,34 @@ const DayDetail: React.FC = () => {
           <PrepList tasks={prepTasks} onToggleTask={handleTogglePrepTask} />
         </section>
       </div>
+
+      {isAddModalOpen && (
+        <AddMealModal
+          date={date}
+          mealType="dinner"
+          householdProfiles={householdProfiles}
+          onClose={() => setIsAddModalOpen(false)}
+          onSave={async (data) => {
+            try {
+              await addMeal({
+                scheduledDate: date,
+                mealType: 'dinner',
+                recipeId: data.recipeId,
+                standaloneData: data.standaloneData,
+                participantIds: data.participants.map(p => p.user_id)
+              });
+              setIsAddModalOpen(false);
+            } catch (err) {
+              console.error('Failed to add meal:', err);
+              alert('Failed to add meal. Please try again.');
+            }
+          }}
+        />
+      )}
+
+      <button className="fab" onClick={() => setIsAddModalOpen(true)}>
+        <span className="material-symbols-outlined">add</span>
+      </button>
     </div>
   );
 };
