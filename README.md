@@ -60,6 +60,34 @@ bash -c "$(curl -sSL https://raw.githubusercontent.com/raiderjoey/meal_planner/m
 
 ---
 
+## 📦 Releases & Versioning
+
+HarvestPlan uses a formalized versioning system to ensure consistency between the application code, database schema, and changelog.
+
+### Release Automation
+All releases must be performed using the `scripts/release.sh` script. This script automates several critical steps:
+1.  **Version Bumping**: Updates the version in `package.json` and `package-lock.json`.
+2.  **Changelog Update**: Moves entries from the `[Unreleased]` section to a new version header in `CHANGELOG.md`.
+3.  **Database Synchronization**: Generates a SQL script to update the `system_info` table and record the update in `system_updates`.
+4.  **Git Tagging**: Commits the changes and creates a git tag for the new version.
+
+**Usage:**
+```bash
+./scripts/release.sh [patch|minor|major]
+```
+
+### Update Center
+The application includes an **Update Center** located in the **Settings** page. 
+- **Version Display**: The current version is displayed in the Dashboard footer and the Update Center.
+- **Update Tracking**: Historical updates are recorded in the database and can be viewed in the Update Center.
+- **Applying Updates**: Administrators can trigger the application of pending database updates through the UI.
+
+### Technical Implementation
+- **`useSystemVersion` Hook**: Provides real-time access to the current system version from the database, with support for live updates via Supabase Realtime.
+- **Database Schema**: The `system_info` table acts as the single source of truth for the current application version.
+
+---
+
 ## 🏗️ Architecture & Protocol
 
 ### Tech Stack

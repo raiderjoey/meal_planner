@@ -3,11 +3,17 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import UpdateCenter from '../UpdateCenter';
 import * as HouseholdContext from '../../../contexts/HouseholdContext';
+import * as SystemVersionHook from '../../../hooks/useSystemVersion';
 import * as SupabaseLib from '../../../lib/supabase';
 
 // Mock HouseholdContext
 vi.mock('../../../contexts/HouseholdContext', () => ({
   useHousehold: vi.fn(),
+}));
+
+// Mock useSystemVersion
+vi.mock('../../../hooks/useSystemVersion', () => ({
+  useSystemVersion: vi.fn(),
 }));
 
 // Mock Supabase Lib
@@ -36,6 +42,11 @@ describe('UpdateCenter Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (SupabaseLib.getLatestUpdateStatus as any).mockResolvedValue(null);
+    (SystemVersionHook.useSystemVersion as any).mockReturnValue({
+      version: '0.1.0',
+      loading: false,
+      error: null,
+    });
   });
 
   it('renders current version and check button', async () => {

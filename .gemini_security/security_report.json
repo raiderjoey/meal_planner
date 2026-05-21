@@ -1,0 +1,62 @@
+[
+  {
+    "vulnerability": "Privilege Escalation via `profiles.role`",
+    "vulnerabilityType": "Security",
+    "severity": "Critical",
+    "dataType": null,
+    "sourceLocation": {
+      "file": "supabase/migrations/20260518000000_core_schema.sql and supabase/migrations/20260520000001_update_schema.sql",
+      "startLine": null,
+      "endLine": null
+    },
+    "sinkLocation": {
+      "file": null,
+      "startLine": null,
+      "endLine": null
+    },
+    "lineContent": "`CREATE POLICY \"Users can update their own profile fields\" ON profiles FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id AND (household_id IS NOT DISTINCT FROM (SELECT household_id FROM profiles WHERE id = auth.uid())));`",
+    "description": "The RLS policy for updating profiles allows users to update any column in their own profile, including the `role` column added in a later migration. This allows any authenticated user to elevate their own privileges to 'admin' by simply updating their profile. Once an admin, the user can insert or update `system_updates`.",
+    "recommendation": "Update the RLS policy for `profiles` to ensure the `role` column cannot be changed by the user. This can be done by adding `AND role = (SELECT role FROM profiles WHERE id = auth.uid())` to the `WITH CHECK` clause.\nID: VULN-002",
+    "codeSuggestion": null
+  },
+  {
+    "vulnerability": "Command Injection on Proxmox Host",
+    "vulnerabilityType": "Security",
+    "severity": "Critical",
+    "dataType": null,
+    "sourceLocation": {
+      "file": "scripts/proxmox_lxc.sh and scripts/proxmox_update.sh",
+      "startLine": null,
+      "endLine": null
+    },
+    "sinkLocation": {
+      "file": null,
+      "startLine": null,
+      "endLine": null
+    },
+    "lineContent": "`read -p \"Enter Container ID [$NEXT_ID]: \" CTID` followed by `pct status $CTID` or `pct push $CTID ...`",
+    "description": "The Proxmox installation and update scripts read a Container ID (CTID) from user input and use it directly in shell commands (`pct create`, `pct status`, `pct push`, `pct exec`) without validation or proper quoting. An attacker providing a malicious CTID (e.g., `100; rm -rf /`) could execute arbitrary commands on the Proxmox host as root.",
+    "recommendation": "Validate that `CTID` is a numeric value before using it. Always quote variables in shell scripts (e.g., `\"$CTID\"`).\nID: VULN-003",
+    "codeSuggestion": null
+  },
+  {
+    "vulnerability": "SQL Injection in Update Script",
+    "vulnerabilityType": "Security",
+    "severity": "Critical",
+    "dataType": null,
+    "sourceLocation": {
+      "file": "scripts/update_lxc.sh",
+      "startLine": null,
+      "endLine": null
+    },
+    "sinkLocation": {
+      "file": null,
+      "startLine": null,
+      "endLine": null
+    },
+    "lineContent": "`psql -h \"$DB_HOST\" -p \"$DB_PORT\" -U \"$DB_USER\" -d \"$DB_NAME\" -c \"UPDATE system_info SET current_version = '$TARGET_VERSION', updated_at = now() WHERE id = 1;\"`",
+    "description": "The update script uses the `TARGET_VERSION` variable, which is fetched from the database, directly in a SQL query without sanitization. An attacker who can influence the `system_updates` table (which is possible via VULN-001) can perform SQL injection. Since the script runs as the 'postgres' superuser (or equivalent), this leads to a full database compromise.",
+    "recommendation": "Use parameterized queries or properly escape all variables before including them in a SQL string. Specifically for `TARGET_VERSION`, validate that it matches a version string format.",
+    "codeSuggestion": null
+  }
+]

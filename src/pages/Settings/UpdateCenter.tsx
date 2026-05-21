@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useHousehold } from '../../contexts/HouseholdContext';
+import { useSystemVersion } from '../../hooks/useSystemVersion';
 import { checkForUpdates, applyUpdate, getLatestUpdateStatus, supabase } from '../../lib/supabase';
 import { SystemUpdate } from '../../types/database';
 import './UpdateCenter.css';
 
 const UpdateCenter: React.FC = () => {
   const { profile } = useHousehold();
-  const [currentVersion, setCurrentVersion] = useState<string>('...');
+  const { version: currentVersion, loading: versionLoading } = useSystemVersion();
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [updateAvailable, setUpdateAvailable] = useState<boolean>(false);
   const [checking, setChecking] = useState<boolean>(false);
@@ -19,9 +20,6 @@ const UpdateCenter: React.FC = () => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const { data: info } = await supabase.from('system_info').select('current_version').single();
-        if (info) setCurrentVersion(info.current_version);
-
         const status = await getLatestUpdateStatus();
         setLatestUpdate(status);
       } catch (err: any) {
@@ -50,7 +48,6 @@ const UpdateCenter: React.FC = () => {
     setError(null);
     try {
       const data = await checkForUpdates();
-      setCurrentVersion(data.currentVersion);
       setLatestVersion(data.latestVersion);
       setUpdateAvailable(data.updateAvailable);
     } catch (err: any) {
@@ -89,7 +86,7 @@ const UpdateCenter: React.FC = () => {
         <div className="version-info">
           <div className="version-item">
             <span className="label">Current Version</span>
-            <span className="value">{currentVersion}</span>
+            <span className="value">{versionLoading ? 'Loading...' : (currentVersion || 'Unknown')}</span>
           </div>
           {latestVersion && (
             <div className="version-item">
