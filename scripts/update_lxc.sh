@@ -57,15 +57,27 @@ sudo -u harvest npm install
 
 # 3. Apply database migrations
 echo "Checking for database migrations..."
+# Explicitly run migrations to ensure they are applied
+sudo -u harvest -H -E npx --yes supabase migration up
+
+# Restart service to ensure everything is fresh
 systemctl restart harvestplan-backend.service
 
 # 4. Rebuild frontend
 echo "Building frontend..."
-sudo -u harvest npm run build
+# Ensure the build uses the latest .env
+sudo -u harvest -H /usr/bin/npm run build
 
 # 5. Restart Nginx to pick up new build
 echo "Restarting Nginx..."
 systemctl restart nginx
+
+# 6. If manual, update the DB version to match package.json
+if [ -z "$UPDATE_ID" ]; then
+    CURRENT_VERSION=$(node -p "require('./package.json').version")
+    echo "Manual update detected. Updating system_info to v$CURRENT_VERSION..."
+    psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -c "UPDATE system_info SET current_version = '$CURRENT_VERSION', updated_at = now() WHERE id = 1;" || echo "Warning: Could not update version in DB. This is expected if the table doesn't exist yet."
+fi
 
 echo "-------------------------------------------------------"
 echo "HarvestPlan update complete!"
