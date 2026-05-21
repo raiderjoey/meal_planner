@@ -61,16 +61,19 @@ echo "Checking for database migrations..."
 systemctl restart harvestplan-backend.service
 
 echo "Waiting for database to be ready (54322)..."
-# Wait up to 30 seconds for the DB port to be open and accepting connections
-for i in {1..30}; do
-    if pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" > /dev/null 2>&1; then
+# Wait up to 60 seconds for the DB port to be open and accepting connections
+for i in {1..60}; do
+    if pg_isready -h "127.0.0.1" -p "$DB_PORT" -U "$DB_USER" > /dev/null 2>&1; then
         echo "Database is ready."
         break
     fi
-    if [ $i -eq 30 ]; then
+    if [ $i -eq 60 ]; then
         echo "Error: Database did not become ready in time."
+        echo "Current systemd backend status:"
+        systemctl status harvestplan-backend.service --no-pager || true
         exit 1
     fi
+    echo "Still waiting ($i/60)..."
     sleep 1
 done
 
