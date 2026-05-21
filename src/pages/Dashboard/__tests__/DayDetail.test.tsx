@@ -3,8 +3,7 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { BrowserRouter, useParams, useNavigate } from 'react-router-dom';
 import DayDetail from '../DayDetail';
-import * as HouseholdContext from '../../../contexts/HouseholdContext';
-import { supabase } from '../../../lib/supabase';
+import * as useMealPlanningModule from '../../../hooks/useMealPlanning';
 
 // Mock react-router-dom
 vi.mock('react-router-dom', async () => {
@@ -16,27 +15,11 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-// Mock HouseholdContext
-vi.mock('../../../contexts/HouseholdContext', () => ({
-  useHousehold: vi.fn(),
+// Mock useMealPlanning hook
+vi.mock('../../../hooks/useMealPlanning', () => ({
+  useMealPlanning: vi.fn(),
 }));
 
-// Mock Supabase
-vi.mock('../../../lib/supabase', () => ({
-  supabase: {
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          eq: vi.fn(() => Promise.resolve({ data: [], error: null })),
-          in: vi.fn(() => Promise.resolve({ data: [], error: null })),
-        })),
-        in: vi.fn(() => Promise.resolve({ data: [], error: null })),
-      })),
-    })),
-  },
-}));
-
-const mockHousehold = { id: 'house-1', name: 'Test House' };
 const mockDate = '2026-05-20';
 const mockNavigate = vi.fn();
 
@@ -52,39 +35,39 @@ const mockMeals = [
       title: 'Test Recipe',
       instructions: 'Prep ahead: Do something.\nCook it.',
     },
-  },
-];
-
-const mockParticipants = [
-  {
-    household_id: 'house-1',
-    meal_plan_id: 'meal-1',
-    user_id: 'user-1',
-    portion_multiplier: 1,
-    status: 'planned',
+    participants: [
+      {
+        household_id: 'house-1',
+        meal_plan_id: 'meal-1',
+        user_id: 'user-1',
+        portion_multiplier: 1,
+        status: 'planned',
+      },
+    ],
   },
 ];
 
 describe('DayDetail Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (vi.mocked(HouseholdContext.useHousehold) as any).mockReturnValue({
-      household: mockHousehold,
-      loading: false,
-    });
     (vi.mocked(useParams) as any).mockReturnValue({
       date: mockDate,
     });
     (vi.mocked(useNavigate) as any).mockReturnValue(mockNavigate);
+    (vi.mocked(useMealPlanningModule.useMealPlanning) as any).mockReturnValue({
+      meals: mockMeals,
+      isLoading: false,
+      error: null,
+      addMeal: vi.fn(),
+    });
   });
 
   it('renders loading state initially', () => {
-    (supabase.from as any).mockReturnValue({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          eq: vi.fn(() => new Promise(() => {})), // Never resolves
-        })),
-      })),
+    (vi.mocked(useMealPlanningModule.useMealPlanning) as any).mockReturnValue({
+      meals: [],
+      isLoading: true,
+      error: null,
+      addMeal: vi.fn(),
     });
 
     render(
@@ -97,30 +80,6 @@ describe('DayDetail Page', () => {
   });
 
   it('renders meals and prep tasks after loading', async () => {
-    (supabase.from as any).mockImplementation((table: string) => {
-      if (table === 'meal_plans') {
-        return {
-          select: vi.fn(() => ({
-            eq: vi.fn(() => ({
-              eq: vi.fn(() => Promise.resolve({ data: mockMeals, error: null })),
-            })),
-          })),
-        };
-      }
-      if (table === 'meal_participants') {
-        return {
-          select: vi.fn(() => ({
-            in: vi.fn(() => Promise.resolve({ data: mockParticipants, error: null })),
-          })),
-        };
-      }
-      return {
-        select: vi.fn(() => ({
-          eq: vi.fn(() => Promise.resolve({ data: [], error: null })),
-        })),
-      };
-    });
-
     render(
       <BrowserRouter>
         <DayDetail />
@@ -135,12 +94,11 @@ describe('DayDetail Page', () => {
   });
 
   it('handles empty states', async () => {
-    (supabase.from as any).mockReturnValue({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          eq: vi.fn(() => Promise.resolve({ data: [], error: null })),
-        })),
-      })),
+    (vi.mocked(useMealPlanningModule.useMealPlanning) as any).mockReturnValue({
+      meals: [],
+      isLoading: false,
+      error: null,
+      addMeal: vi.fn(),
     });
 
     render(
@@ -156,23 +114,6 @@ describe('DayDetail Page', () => {
   });
 
   it('toggles prep task completion', async () => {
-    (supabase.from as any).mockImplementation((table: string) => {
-      if (table === 'meal_plans') {
-        return {
-          select: vi.fn(() => ({
-            eq: vi.fn(() => ({
-              eq: vi.fn(() => Promise.resolve({ data: mockMeals, error: null })),
-            })),
-          })),
-        };
-      }
-      return {
-        select: vi.fn(() => ({
-          in: vi.fn(() => Promise.resolve({ data: mockParticipants, error: null })),
-        })),
-      };
-    });
-
     render(
       <BrowserRouter>
         <DayDetail />
@@ -191,12 +132,11 @@ describe('DayDetail Page', () => {
   });
 
   it('navigates to previous and next days', async () => {
-    (supabase.from as any).mockReturnValue({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          eq: vi.fn(() => Promise.resolve({ data: [], error: null })),
-        })),
-      })),
+    (vi.mocked(useMealPlanningModule.useMealPlanning) as any).mockReturnValue({
+      meals: [],
+      isLoading: false,
+      error: null,
+      addMeal: vi.fn(),
     });
 
     render(
@@ -219,4 +159,5 @@ describe('DayDetail Page', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/day/2026-05-21');
   });
 });
+
 
