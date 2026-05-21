@@ -4,6 +4,7 @@ import '@testing-library/jest-dom';
 import { BrowserRouter, useParams, useNavigate } from 'react-router-dom';
 import DayDetail from '../DayDetail';
 import * as useMealPlanningModule from '../../../hooks/useMealPlanning';
+import * as HouseholdContext from '../../../contexts/HouseholdContext';
 
 // Mock react-router-dom
 vi.mock('react-router-dom', async () => {
@@ -20,6 +21,23 @@ vi.mock('../../../hooks/useMealPlanning', () => ({
   useMealPlanning: vi.fn(),
 }));
 
+// Mock HouseholdContext
+vi.mock('../../../contexts/HouseholdContext', () => ({
+  useHousehold: vi.fn(),
+}));
+
+// Mock Supabase
+vi.mock('../../../lib/supabase', () => ({
+  supabase: {
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => Promise.resolve({ data: [], error: null })),
+      })),
+    })),
+  },
+}));
+
+const mockHousehold = { id: 'house-1', name: 'Test House' };
 const mockDate = '2026-05-20';
 const mockNavigate = vi.fn();
 
@@ -54,6 +72,10 @@ describe('DayDetail Page', () => {
       date: mockDate,
     });
     (vi.mocked(useNavigate) as any).mockReturnValue(mockNavigate);
+    (vi.mocked(HouseholdContext.useHousehold) as any).mockReturnValue({
+      household: mockHousehold,
+      loading: false,
+    });
     (vi.mocked(useMealPlanningModule.useMealPlanning) as any).mockReturnValue({
       meals: mockMeals,
       isLoading: false,
@@ -158,6 +180,25 @@ describe('DayDetail Page', () => {
     fireEvent.click(nextButton);
     expect(mockNavigate).toHaveBeenCalledWith('/day/2026-05-21');
   });
+
+  it('opens add meal modal when FAB is clicked', async () => {
+    render(
+      <BrowserRouter>
+        <DayDetail />
+      </BrowserRouter>
+    );
+
+    const fab = screen.getByRole('button', { name: /add/i });
+    fireEvent.click(fab);
+
+    await waitFor(() => {
+      // AddMealModal currently renders "Add dinner"
+      expect(screen.getByText(/Add dinner/i)).toBeInTheDocument();
+    });
+  });
+
 });
+
+
 
 
