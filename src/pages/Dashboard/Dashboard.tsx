@@ -3,18 +3,15 @@ import SummaryDayCard from '../../components/Dashboard/SummaryDayCard';
 import AddMealModal from '../../components/Dashboard/AddMealModal';
 import { useHousehold } from '../../contexts/HouseholdContext';
 import { useSystemVersion } from '../../hooks/useSystemVersion';
+import { useMealPlanning } from '../../hooks/useMealPlanning';
 import { supabase } from '../../lib/supabase';
-import { MealPlan, Profile, MealType } from '../../types/database';
+import { Profile, MealType } from '../../types/database';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
   const { household } = useHousehold();
   const { version } = useSystemVersion();
-  const [meals, setMeals] = useState<MealPlan[]>([]);
-  const [householdProfiles, setHouseholdProfiles] = useState<Profile[]>([]);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [activeSlot, setActiveSlot] = useState<{ date: string; type: MealType } | null>(null);
-
+  
   const days = [
     { name: 'Mon', date: '2026-05-18' },
     { name: 'Tue', date: '2026-05-19', isToday: true },
@@ -25,33 +22,39 @@ const Dashboard: React.FC = () => {
     { name: 'Sun', date: '2026-05-24' },
   ];
 
+  const { meals, addMeal, isLoading } = useMealPlanning({ 
+    start: days[0].date, 
+    end: days[6].date 
+  });
+
+  const [householdProfiles, setHouseholdProfiles] = useState<Profile[]>([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [activeSlot, setActiveSlot] = useState<{ date: string; type: MealType } | null>(null);
+
   useEffect(() => {
     if (household) {
-      fetchHouseholdData();
+      fetchProfiles();
     }
   }, [household]);
 
-  const fetchHouseholdData = async () => {
+  const fetchProfiles = async () => {
     if (!household) return;
 
-    // Fetch household profiles
     const { data: profiles } = await supabase
       .from('profiles')
       .select('*')
       .eq('household_id', household.id);
     
     if (profiles) setHouseholdProfiles(profiles);
-
-    // Fetch meals for the week
-    const { data: mealData } = await supabase
-      .from('meal_plans')
-      .select('*')
-      .eq('household_id', household.id)
-      .gte('scheduled_date', days[0].date)
-      .lte('scheduled_date', days[6].date);
-
-    if (mealData) setMeals(mealData);
   };
+
+  if (isLoading) {
+    return (
+      <div className="dashboard-loading">
+        <p className="body-md">Loading your weekly plan...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard">
@@ -87,20 +90,20 @@ const Dashboard: React.FC = () => {
           mealType={activeSlot.type}
           householdProfiles={householdProfiles}
           onClose={() => setIsAddModalOpen(false)}
-          onSave={(data) => {
-            const newMeal: MealPlan = {
-              id: Math.random().toString(36).substr(2, 9),
-              household_id: household?.id || '',
-              scheduled_date: activeSlot.date,
-              meal_type: activeSlot.type,
-              recipe_id: data.recipeId,
-              standalone_data: data.standaloneData,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            };
-            
-            setMeals(prev => [...prev, newMeal]);
-            setIsAddModalOpen(false);
+          onSave={async (data) => {
+            try {
+              await addMeal({
+                scheduledDate: activeSlot.date,
+                mealType: activeSlot.type,
+                recipeId: data.recipeId,
+                standaloneData: data.standaloneData,
+                participantIds: data.participants.map(p => p.user_id)
+              });
+              setIsAddModalOpen(false);
+            } catch (err) {
+              console.error('Failed to add meal:', err);
+              alert('Failed to add meal. Please try again.');
+            }
           }}
         />
       )}

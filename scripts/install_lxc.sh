@@ -99,9 +99,10 @@ fi
 
 API_URL=$(echo "$STATUS" | grep "API URL" | awk '{print $3}')
 ANON_KEY=$(echo "$STATUS" | grep "anon key" | awk '{print $3}')
+SERVICE_KEY=$(echo "$STATUS" | grep "service_role key" | awk '{print $3}')
 
-if [ -z "$API_URL" ] || [ -z "$ANON_KEY" ]; then
-  echo "Error: Could not extract Supabase API URL or Anon Key."
+if [ -z "$API_URL" ] || [ -z "$ANON_KEY" ] || [ -z "$SERVICE_KEY" ]; then
+  echo "Error: Could not extract Supabase API URL, Anon Key, or Service Key."
   echo "Status output was:"
   echo "$STATUS"
   exit 1
@@ -121,6 +122,7 @@ echo "Using API URL: $API_URL"
 cat <<EOF > .env
 VITE_SUPABASE_URL=$API_URL
 VITE_SUPABASE_ANON_KEY=$ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY=$SERVICE_KEY
 EOF
 chown harvest:harvest .env
 

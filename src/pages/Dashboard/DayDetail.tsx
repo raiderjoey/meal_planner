@@ -1,68 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import DayHeader from '../../components/Dashboard/DayHeader';
 import DetailMealCard from '../../components/Dashboard/DetailMealCard';
 import PrepList from '../../components/Dashboard/PrepList';
-import { useHousehold } from '../../contexts/HouseholdContext';
-import { supabase } from '../../lib/supabase';
-import { MealPlan, Recipe, MealParticipant } from '../../types/database';
+import { useMealPlanning } from '../../hooks/useMealPlanning';
 import { PrepTask } from '../../types/dashboard';
 import { getPrepTasks } from '../../utils/prepAggregator';
 import './DayDetail.css';
 
 const DayDetail: React.FC = () => {
   const { date } = useParams<{ date: string }>();
-  const { household } = useHousehold();
   
-  const [meals, setMeals] = useState<(MealPlan & { recipe?: Recipe })[]>([]);
-  const [participants, setParticipants] = useState<MealParticipant[]>([]);
+  const dateRange = useMemo(() => ({
+    start: date || '',
+    end: date || ''
+  }), [date]);
+
+  const { meals, isLoading } = useMealPlanning(dateRange);
   const [prepTasks, setPrepTasks] = useState<PrepTask[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (date && household) {
-      fetchDayData();
-    }
-  }, [date, household]);
-
-  const fetchDayData = async () => {
-    if (!date || !household) return;
-    setIsLoading(true);
-
-    try {
-      // Fetch meals with recipes
-      const { data: mealData, error: mealError } = await supabase
-        .from('meal_plans')
-        .select('*, recipe:recipes(*)')
-        .eq('household_id', household.id)
-        .eq('scheduled_date', date);
-
-      if (mealError) throw mealError;
-
-      const fetchedMeals = mealData || [];
-      setMeals(fetchedMeals);
-
-      // Fetch participants for these meals
-      if (fetchedMeals.length > 0) {
-        const mealIds = fetchedMeals.map(m => m.id);
-        const { data: participantData, error: participantError } = await supabase
-          .from('meal_participants')
-          .select('*')
-          .in('meal_plan_id', mealIds);
-
-        if (participantError) throw participantError;
-        setParticipants(participantData || []);
-      }
-
-      // Aggregate prep tasks
-      const tasks = getPrepTasks(fetchedMeals);
+    if (meals.length > 0) {
+      const tasks = getPrepTasks(meals);
       setPrepTasks(tasks);
-    } catch (error) {
-      console.error('Error fetching day data:', error);
-    } finally {
-      setIsLoading(false);
+    } else {
+      setPrepTasks([]);
     }
-  };
+  }, [meals]);
 
   const handleTogglePrepTask = (taskId: string) => {
     setPrepTasks(prev => prev.map(task => 
@@ -86,7 +50,7 @@ const DayDetail: React.FC = () => {
                 <DetailMealCard 
                   key={meal.id} 
                   meal={meal} 
-                  participants={participants.filter(p => p.meal_plan_id === meal.id)} 
+                  participants={meal.participants} 
                   tags={[]} // Tags could be fetched from recipe_tags if needed
                 />
               ))
