@@ -47,24 +47,28 @@ REPO_URL="https://github.com/raiderjoey/meal_planner.git"
 INSTALL_DIR="/opt/meal_planner"
 
 if [ -d "$INSTALL_DIR" ]; then
-  echo "Cleaning up existing installation..."
-  rm -rf "$INSTALL_DIR"
+  if [[ "$1" == "--force" ]]; then
+    echo "Forcing re-installation. Cleaning up existing directory..."
+    rm -rf "$INSTALL_DIR"
+  else
+    echo "Directory $INSTALL_DIR already exists. Skipping clone and using existing files."
+    echo "Use --force to wipe and reinstall."
+    cd "$INSTALL_DIR"
+    sudo -u harvest git pull
+    # Skip to dependency installation
+  fi
 fi
 
-# Create dedicated user
-if ! id "harvest" &>/dev/null; then
-  echo "Creating harvest user..."
-  useradd -m -s /usr/sbin/nologin harvest
+if [ ! -d "$INSTALL_DIR" ]; then
+  echo "Cloning repository..."
+  if [ -n "$GITHUB_TOKEN" ]; then
+    git clone "https://${GITHUB_TOKEN}@github.com/raiderjoey/meal_planner.git" "$INSTALL_DIR"
+  else
+    git clone "$REPO_URL" "$INSTALL_DIR"
+  fi
+  chown -R harvest:harvest "$INSTALL_DIR"
+  cd "$INSTALL_DIR"
 fi
-
-echo "Cloning repository..."
-if [ -n "$GITHUB_TOKEN" ]; then
-  git clone "https://${GITHUB_TOKEN}@github.com/raiderjoey/meal_planner.git" "$INSTALL_DIR"
-else
-  git clone "$REPO_URL" "$INSTALL_DIR"
-fi
-chown -R harvest:harvest "$INSTALL_DIR"
-cd "$INSTALL_DIR"
 
 # 7. Install NPM Dependencies
 echo "Installing NPM dependencies..."
