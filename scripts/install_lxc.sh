@@ -160,8 +160,9 @@ User=harvest
 Group=harvest
 WorkingDirectory=$INSTALL_DIR
 Environment=SUPABASE_TELEMETRY_DISABLED=1
-ExecStart=/usr/bin/npx supabase start
-ExecStop=/usr/bin/npx supabase stop
+# Use the installed supabase binary directly for better performance
+ExecStart=/usr/local/bin/supabase start
+ExecStop=/usr/local/bin/supabase stop
 TimeoutStartSec=600
 StandardOutput=journal
 StandardError=journal
