@@ -74,7 +74,7 @@ for i in {1..30}; do
     sleep 1
 done
 
-# Explicitly run migrations
+# Explicitly run migrations to ensure they are applied
 sudo -u harvest -H -E npx --yes supabase migration up
 
 # 4. Rebuild frontend
