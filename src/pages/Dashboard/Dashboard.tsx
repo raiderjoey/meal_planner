@@ -94,7 +94,7 @@ const Dashboard: React.FC = () => {
             try {
               await addMeal({
                 scheduledDate: activeSlot.date,
-                mealType: activeSlot.type,
+                mealType: data.mealType,
                 recipeId: data.recipeId,
                 standaloneData: data.standaloneData,
                 participantIds: data.participants.map(p => p.user_id)
