@@ -18,7 +18,7 @@ apt-get update
 apt-get upgrade -y
 
 # 2. Install Dependencies
-apt-get install -y curl git sudo build-essential ca-certificates gnupg nginx
+apt-get install -y curl git sudo build-essential ca-certificates gnupg nginx postgresql-client
 
 # 3. Install Docker
 if ! command -v docker &> /dev/null; then

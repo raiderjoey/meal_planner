@@ -57,11 +57,25 @@ sudo -u harvest npm install
 
 # 3. Apply database migrations
 echo "Checking for database migrations..."
-# Explicitly run migrations to ensure they are applied
-sudo -u harvest -H -E npx --yes supabase migration up
-
-# Restart service to ensure everything is fresh
+# Restart service first to ensure Docker containers are running
 systemctl restart harvestplan-backend.service
+
+echo "Waiting for database to be ready (54322)..."
+# Wait up to 30 seconds for the DB port to be open and accepting connections
+for i in {1..30}; do
+    if pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" > /dev/null 2>&1; then
+        echo "Database is ready."
+        break
+    fi
+    if [ $i -eq 30 ]; then
+        echo "Error: Database did not become ready in time."
+        exit 1
+    fi
+    sleep 1
+done
+
+# Explicitly run migrations
+sudo -u harvest -H -E npx --yes supabase migration up
 
 # 4. Rebuild frontend
 echo "Building frontend..."
