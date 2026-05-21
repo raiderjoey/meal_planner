@@ -1,0 +1,21 @@
+[Unit]
+Description=HarvestPlan Update Listener
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/jhw/Development/meal_planner/scripts
+ExecStart=/usr/bin/bash /home/jhw/Development/meal_planner/scripts/update_listener.sh
+Restart=always
+RestartSec=10
+
+# Environment variables for DB connection
+Environment=DB_HOST=localhost
+Environment=DB_PORT=54322
+Environment=DB_NAME=postgres
+Environment=DB_USER=postgres
+Environment=DB_PASSWORD=postgres
+
+[Install]
+WantedBy=multi-user.target

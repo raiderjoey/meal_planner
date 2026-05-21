@@ -9,6 +9,23 @@ export interface Profile {
   household_id: string;
   full_name: string;
   avatar_url?: string;
+  role: 'member' | 'admin';
+}
+
+export interface SystemInfo {
+  id: number;
+  current_version: string;
+  updated_at: string;
+}
+
+export interface SystemUpdate {
+  id: string;
+  target_version: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+  log_output: string | null;
+  created_at: string;
+  updated_at: string;
+  created_by: string;
 }
 
 export interface Recipe {

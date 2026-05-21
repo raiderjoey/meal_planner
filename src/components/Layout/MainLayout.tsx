@@ -37,6 +37,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             >
               Shopping List
             </NavLink>
+            <NavLink 
+              to="/settings/updates" 
+              className="nav-link"
+            >
+              Updates
+            </NavLink>
           </nav>
           <div className="header-actions">
             <div className="search-container">

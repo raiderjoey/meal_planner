@@ -5,12 +5,40 @@
 
 set -e
 
+UPDATE_ID=$1
+TARGET_VERSION=$2
+
+# Configuration for DB reporting
+DB_HOST=${DB_HOST:-"localhost"}
+DB_PORT=${DB_PORT:-"54322"}
+DB_NAME=${DB_NAME:-"postgres"}
+DB_USER=${DB_USER:-"postgres"}
+DB_PASSWORD=${DB_PASSWORD:-"postgres"}
+export PGPASSWORD=$DB_PASSWORD
+
 # Logging
-LOG_FILE="update.log"
+LOG_FILE="update_${UPDATE_ID:-"manual"}.log"
 exec > >(tee -a "$LOG_FILE") 2>&1
 echo "Starting HarvestPlan Update: $(date)"
 
 INSTALL_DIR="/opt/meal_planner"
+
+report_status() {
+    local status=$1
+    local log_file=$2
+    if [ -n "$UPDATE_ID" ]; then
+        # Capture last 50KB of logs and escape for SQL
+        local log_content=$(tail -c 50000 "$log_file" | sed "s/'/''/g")
+        psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -c "UPDATE system_updates SET status = '$status', log_output = '$log_content', updated_at = now() WHERE id = '$UPDATE_ID';"
+        
+        if [ "$status" == "completed" ]; then
+            psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -c "UPDATE system_info SET current_version = '$TARGET_VERSION', updated_at = now() WHERE id = 1;"
+        fi
+    fi
+}
+
+# Ensure we report failure if any command fails
+trap 'report_status "failed" "$LOG_FILE"' ERR
 
 if [ ! -d "$INSTALL_DIR" ]; then
     echo "Error: Installation directory $INSTALL_DIR not found."
@@ -21,8 +49,6 @@ cd "$INSTALL_DIR"
 
 # 1. Pull latest changes
 echo "Pulling latest changes from Git..."
-# If it's a private repo, we might need to handle the token again, 
-# but usually the remote is already configured with it from the install.
 sudo -u harvest git pull
 
 # 2. Install NPM dependencies
@@ -31,9 +57,6 @@ sudo -u harvest npm install
 
 # 3. Apply database migrations
 echo "Checking for database migrations..."
-# Since supabase start is managed by systemd, we can either restart the service
-# or run migrations explicitly. Restarting the service is safer as it ensures
-# all containers are up to date and migrations are applied.
 systemctl restart harvestplan-backend.service
 
 # 4. Rebuild frontend
@@ -47,3 +70,5 @@ systemctl restart nginx
 echo "-------------------------------------------------------"
 echo "HarvestPlan update complete!"
 echo "-------------------------------------------------------"
+
+report_status "completed" "$LOG_FILE"

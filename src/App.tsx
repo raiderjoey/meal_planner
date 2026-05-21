@@ -7,6 +7,7 @@ import RecipeCreator from './pages/Recipes/RecipeCreator';
 import ShoppingList from './pages/ShoppingList/ShoppingList';
 import Pantry from './pages/Pantry/Pantry';
 import DayDetail from './pages/Dashboard/DayDetail';
+import UpdateCenter from './pages/Settings/UpdateCenter';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/recipes/new" element={<RecipeCreator />} />
           <Route path="/pantry" element={<Pantry />} />
           <Route path="/shopping-list" element={<ShoppingList />} />
+          <Route path="/settings/updates" element={<UpdateCenter />} />
         </Routes>
       </MainLayout>
     </Router>

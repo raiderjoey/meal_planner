@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { ShoppingListItem, PantryItem, Nutrition } from '../types/database';
+import { ShoppingListItem, PantryItem, Nutrition, SystemUpdate } from '../types/database';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
@@ -72,4 +72,33 @@ export const addAdHocItem = async (item: {
     .insert([item]);
 
   if (error) throw error;
+};
+
+export const checkForUpdates = async (): Promise<{ currentVersion: string; latestVersion: string; updateAvailable: boolean }> => {
+  const { data, error } = await supabase.functions.invoke('update-checker');
+  if (error) throw error;
+  return data;
+};
+
+export const applyUpdate = async (targetVersion: string, profileId: string): Promise<void> => {
+  const { error } = await supabase
+    .from('system_updates')
+    .insert([{
+      target_version: targetVersion,
+      status: 'pending',
+      created_by: profileId
+    }]);
+  if (error) throw error;
+};
+
+export const getLatestUpdateStatus = async (): Promise<SystemUpdate | null> => {
+  const { data, error } = await supabase
+    .from('system_updates')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  
+  if (error) throw error;
+  return data;
 };
