@@ -102,7 +102,7 @@ const DayDetail: React.FC = () => {
             try {
               await addMeal({
                 scheduledDate: date,
-                mealType: 'dinner',
+                mealType: data.mealType,
                 recipeId: data.recipeId,
                 standaloneData: data.standaloneData,
                 participantIds: data.participants.map(p => p.user_id)

@@ -8,6 +8,7 @@ interface AddMealModalProps {
   householdProfiles: Profile[];
   onClose: () => void;
   onSave: (data: {
+    mealType: MealType;
     recipeId?: string;
     standaloneData?: { name: string; nutrition: Nutrition };
     participants: { user_id: string; portion_multiplier: number }[];
@@ -27,6 +28,8 @@ const AddMealModal: React.FC<AddMealModalProps> = ({
   onSave
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [localMealType, setLocalMealType] = useState<MealType>(mealType);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<typeof MOCK_RECIPES[0] | null>(null);
   const [standaloneName, setStandaloneName] = useState('');
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>(
@@ -45,11 +48,13 @@ const AddMealModal: React.FC<AddMealModalProps> = ({
 
     if (selectedRecipe) {
       onSave({
+        mealType: localMealType,
         recipeId: selectedRecipe.id,
         participants
       });
     } else if (standaloneName) {
       onSave({
+        mealType: localMealType,
         standaloneData: {
           name: standaloneName,
           nutrition: { calories: 0, protein: 0, fat: 0, carbs: 0 } // In real app, fetch from API
@@ -65,41 +70,67 @@ const AddMealModal: React.FC<AddMealModalProps> = ({
     );
   };
 
+  const mealTypes: MealType[] = ['breakfast', 'lunch', 'dinner', 'snacks'];
+
   return (
     <div className="modal-overlay">
       <div className="modal-content meal-card-shadow">
         <div className="modal-header">
-          <h2 className="headline-sm">Add {mealType}</h2>
+          <h2 className="headline-sm">Add Meal</h2>
           <button className="icon-button" onClick={onClose}>
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
 
         <div className="modal-body">
+          <section className="meal-type-section">
+            <h3 className="section-title">Meal Type</h3>
+            <div className="segmented-control">
+              {mealTypes.map(type => (
+                <button
+                  key={type}
+                  className={`segment-btn ${localMealType === type ? 'active' : ''}`}
+                  onClick={() => setLocalMealType(type)}
+                >
+                  {type === 'snacks' ? 'Snack' : type.charAt(0).toUpperCase() + type.slice(1)}
+                </button>
+              ))}
+            </div>
+          </section>
+
           <section className="search-section">
+            <h3 className="section-title">What are you eating?</h3>
             <div className="search-box">
               <span className="material-symbols-outlined">search</span>
               <input 
                 type="text" 
                 placeholder="Search recipes or add custom..." 
                 value={searchTerm}
+                onFocus={() => setIsDropdownOpen(true)}
+                onBlur={() => {
+                  // Small delay to allow clicking dropdown items
+                  setTimeout(() => setIsDropdownOpen(false), 200);
+                }}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
                   setSelectedRecipe(null);
                   setStandaloneName(e.target.value);
+                  setIsDropdownOpen(true);
                 }}
               />
             </div>
             
-            {searchTerm && !selectedRecipe && (
+            {isDropdownOpen && searchTerm && !selectedRecipe && (
               <div className="search-results">
                 {filteredRecipes.map(r => (
                   <div 
                     key={r.id} 
                     className="search-result-item"
-                    onClick={() => {
+                    onMouseDown={(e) => {
+                      e.preventDefault(); // Prevent blur
                       setSelectedRecipe(r);
                       setSearchTerm(r.title);
+                      setIsDropdownOpen(false);
                     }}
                   >
                     <span className="material-symbols-outlined">restaurant</span>
@@ -108,7 +139,11 @@ const AddMealModal: React.FC<AddMealModalProps> = ({
                 ))}
                 <div 
                   className="search-result-item custom"
-                  onClick={() => setStandaloneName(searchTerm)}
+                  onMouseDown={(e) => {
+                    e.preventDefault(); // Prevent blur
+                    setStandaloneName(searchTerm);
+                    setIsDropdownOpen(false);
+                  }}
                 >
                   <span className="material-symbols-outlined">add</span>
                   Add "{searchTerm}" as custom meal
@@ -146,7 +181,7 @@ const AddMealModal: React.FC<AddMealModalProps> = ({
             disabled={!selectedRecipe && !standaloneName}
             onClick={handleSave}
           >
-            Schedule Meal
+            Add Meal
           </button>
         </div>
       </div>
